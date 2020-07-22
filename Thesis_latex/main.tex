@@ -1,0 +1,94 @@
+% EPL master thesis covers template
+\documentclass{EPL-master-thesis-covers-EN}
+
+% \documentclass{article}
+% \usepackage[utf8]{inputenc}
+% \usepackage{float}
+% \usepackage{graphicx}
+\usepackage{tikz}
+\usepackage[demo]{graphicx}
+\usepackage{subcaption}
+\usepackage{pgfplots}
+\usepackage{enumitem}
+\usepackage{amsmath}
+
+% Please fill in the following boxes
+% Title of the thesis
+\title{Large-scale data visualization with BH t-SNE, LargeViz, and Umap}
+
+% Subtitle - remove this line if not applicable
+%\subtitle{Optional subtitle}
+
+% Name of the student author(s)
+\author{Di \textsc{Wu}}
+%\secondauthor{Firstname \textsc{Lastname}}		% remove if not applicable
+%\thirdauthor{Firstname \textsc{Lastname}}			% remove if not applicable
+
+% Official title of the master degree (copy/paste from list below)
+% Master [120] in Biomedical Engineering
+% Master [120] in Chemical and Materials Engineering
+% Master [120] in Civil Engineering
+% Master [120] in Computer Science
+% Master [120] in Computer Science and Engineering
+% Master [120] in Cybersecurity
+% Master [120] in Data Sciences Engineering
+% Master [120] in Data Science: Information technology
+% Master [120] in Electrical Engineering
+% Master [120] in Electro-mechanical Engineering
+% Master [120] in Mathematical Engineering
+% Master [120] in Mechanical Engineering
+% Master [120] in Physical Engineering
+% Master [60] in Computer Science
+% Specialised master in nanotechnologies
+% Specialised master in nuclear engineering
+\degreetitle{Master [120] in Data Sciences Engineering}
+
+% Name of the supervisor(s)
+\supervisor{John \textsc{Lee}}
+\secondsupervisor{Cyril \textsc{De Bodt}}		% remove if not applicable
+%\thirdsupervisor{Firstname \textsc{Lastname}}		% remove if not applicable
+
+% Name of the reader(s)
+\readerone{Michel \textsc{Verleysen}}
+%\readertwo{Firstname \textsc{Lastname}}			% remove if not applicable
+%\readerthree{Firstname \textsc{Lastname}}			% remove if not applicable
+%\readerfour{Firstname \textsc{Lastname}}			% remove if not applicable
+%\readerfive{Firstname \textsc{Lastname}}			% remove if not applicable
+
+% Academic year (update if necessary)
+\years{2019--2020}
+
+% Document
+\begin{document}
+  % Front cover page
+  \maketitle
+  
+\thispagestyle{empty}		% To suppress header and footer on the back of the cover page
+
+\include{chapters/acknowledgments}
+
+\listoftodos
+
+\tableofcontents
+\newpage
+
+\include{chapters/intro}
+%\include{chapters/background} 
+\include{chapters/Algorithms}
+\include{chapters/comparison}
+
+\bookmarksetup{startatroot}
+\include{chapters/conclusion}
+
+\begin{thebibliography}{99}  
+\bibitem{ref1}Nupur Kumari , Siddarth R, Akash Rupela: High-dimensional Data Visualization at Scale, Computer Vision and Pattern Recognition (CVPR), 2012 IEEE Conference on, IEEE, 2012: 2911-2918.  
+\bibitem{ref2}Lowe D G. Distinctive image features from scale-invariant keypoints, International journal of computer vision, 2004, 60(2): 91-110.  
+\bibitem{ref3}Philbin J, Chum O, Isard M, et al. Lost in quantization: Improving particular object retrieval in large scale image databases, Computer Vision and Pattern Recognition, 2008. CVPR 2008, IEEE Conference on, IEEE, 2008: 1-8.
+\bibitem{ref4}J. A. Lee and M. Verleysen. Quality assessment of dimensionality reduction: Rank-based criteria. Neurocomputing, 72(7):1431–1443, 2009.
+
+\end{thebibliography}
+
+  % Back cover page
+  \backcoverpage
+
+\end{document}
