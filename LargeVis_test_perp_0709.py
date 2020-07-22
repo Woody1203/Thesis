@@ -60,7 +60,7 @@
 
 ########################################################################################################
 ########################################################################################################
-import numpy as np, numba, sklearn.decomposition, scipy.spatial.distance, matplotlib.pyplot as plt, matplotlib, sklearn.datasets
+import numpy as np,pandas as pd, numba, sklearn.decomposition, scipy.spatial.distance, matplotlib.pyplot as plt, matplotlib, sklearn.datasets
 from sklearn.manifold import TSNE
 import seaborn as sns
 from pandas import read_csv
@@ -802,6 +802,23 @@ def viz_test(X, lab, tit=''):
     plt.show()
     plt.close()
 
+def open_dataset():
+    # Load dataset
+    url = "http://archive.ics.uci.edu/ml/machine-learning-databases/glass/glass.data"
+    names = [
+        'id',
+        'refractive-index',
+        'Sodium',
+        'Magnesium',
+        'Aluminum',
+        'Silicon',
+        'Potassium',
+        'Calcium',
+        'Barium',
+        'Iron',
+        'class'
+    ]
+    return pd.read_csv(url, names=names)
 ####  test
 
 def viz_qa(path, name, Ly, ymin=None, ymax=None, Lmarkers=None, Lcols=None, Lleg=None, Lls=None, Lmedw=None, Lsdots=None, lw=2, markevery=0.1, tit='', xlabel='', ylabel='', alpha_plot=0.9, alpha_leg=0.8, stit=25, sax=20, sleg=15, zleg=1, loc_leg='best', ncol_leg=1, lMticks=10, lmticks=5, wMticks=2, wmticks=1, nyMticks=11, mymticks=4, grid=True, grid_ls='solid', grid_col='lightgrey', grid_alpha=0.7, xlog=True):
@@ -949,7 +966,17 @@ if __name__ == '__main__':
 ############   largevis test   #####################
     ## prepare the datasets
     print("Loading the test data set.")
-    X_hds, labels = sklearn.datasets.load_digits(n_class=10, return_X_y=True)
+    #### load glass dataset  ###
+    dataset = open_dataset()
+    labels =dataset['class']
+    dataset_glass = dataset.drop('id', 1)
+    dataset_glass = dataset.drop('class', 1)
+
+    X_hds = dataset_glass.to_numpy()
+    labels = labels.to_numpy()
+    #### load glass dataset  ###
+    ## digit dataset
+    ## X_hds, labels = sklearn.datasets.load_digits(n_class=10, return_X_y=True)
     # name of the txt form dataset created
     output_txt_file_name = "test_digit_HD.txt"
     #  Use the previously defined variable "output_txt_file_name" as the txt file name here
@@ -976,7 +1003,7 @@ if __name__ == '__main__':
     init = 'ran'
     # number of threads
     threads_list = [1, 2, 4]
-    path = 'C:/Users/15754/Desktop/LDATE2990 - Master Thesis/Project/results/LargeVis/digit/graphs_iteration/'
+    path = 'C:/Users/15754/Desktop/LDATE2990 - Master Thesis/Project/results/LargeVis/glass/graphs_iteration/0721/'
     # List of the theta thresholds to employ with cat-SNE.
     Ltheta = [0.7, 0.8, 0.9]
     #round = 1
@@ -995,12 +1022,16 @@ if __name__ == '__main__':
     min_dist_group = [0.1, 0.25, 0.5]
     neigh_group = [100, 150, 200]
     gamma_group = [4,7,10]
-    iterations = [1,2,3]
+    iterations = [1,2,3,4]
+    iterations_1 = [1]
     #neg_group = [3,5,7]
-    tot_perplexity_gourp = [[50,50,50],[50,50,50]]
+    tot_perplexity_gourp = [[13, 25, 30],[35, 40, 45],[55, 60, 65],[70, 75,	88]]
     tot_neg_group = [[1,2,3],[4,5,6],[7,8,9]]
+    tot_gamma_group = [[1,2,3],[4,5,6],[8,9,10],[11,12,13]]
     #tot_k_group = [[38,75,90],[105,120,135],[165,180,195],[210,225,263]]
-    tot_k_group = [[50,50,50],[50,50,50]]
+    tot_k_group = [[38, 75, 90],[105, 120, 135],[165, 180, 195],[210, 225, 263]]
+    tot_k_group_default = [[50,50,50],[50,50,50]]
+    outermost_iterations = [1,2,3] # the most outside iteration
     #
 
     #print("Loading the test data set.")
@@ -1031,80 +1062,107 @@ if __name__ == '__main__':
     #X_hds, labels = X_hds[id_subs,:], labels[id_subs]
     # Computing the pairwise HD distances for the quality assessment.
     d_hd = scipy.spatial.distance.squareform(X=scipy.spatial.distance.pdist(X=X_hds, metric=hd_metric), force='tomatrix')
-    for iteration in iterations:
-        round_mark = int(0)
-        for k_group in tot_k_group:
-            round_mark += 1
-            print("iteration_",iteration)
-            print("round_",round_mark)
-            # For each theta
-            for k_value in k_group:
+    for outermost_iteration in outermost_iterations:
+        for iteration in iterations:
+            round_mark = int(0)
+            if iteration == 1:
+                tot_para_group = tot_perplexity_gourp
+                mark = "perplexity"
+            elif iteration == 2:
+                tot_para_group = tot_neg_group
+                mark = "neg"
+            elif iteration == 3:
+                tot_para_group = tot_gamma_group
+                mark = "gamma"
+            else:
+                tot_para_group = tot_k_group
+                mark = "neigh"
+            for para_group in tot_para_group:
+                round_mark += 1
+                print("outermost_iteration",outermost_iteration)
+                print("parameter_",mark)
+                print("round_",round_mark)
+                # For each theta
+                for para_value in para_group:
 
-                #n_neighbors = 10
-                  ####
-                start_time = time.time()
-                print("Applying LargeVis with k_value = {k_value}".format(k_value=k_value))
+                    #n_neighbors = 10
+                      ####
+                    start_time = time.time()
+                    #print("this is mark",mark)
+                    print("Applying LargeVis with {mark} = {value}".format(mark=mark, value=para_value))
 
-                #####  test  #####
-                #X_test_lds, max_ti = catsne(X_hds=X_hds, labels=labels, theta=theta, init=init, dim_lds=dim_lds, nit_max=nit_max, rand_state=np.random.RandomState(0), hd_metric=hd_metric)
-                #print("**************",labels.shape)
-                #print(type(max_ti))
-                #print(max_ti.shape)
+                    #####  test  #####
+                    #X_test_lds, max_ti = catsne(X_hds=X_hds, labels=labels, theta=theta, init=init, dim_lds=dim_lds, nit_max=nit_max, rand_state=np.random.RandomState(0), hd_metric=hd_metric)
+                    #print("**************",labels.shape)
+                    #print(type(max_ti))
+                    #print(max_ti.shape)
 
-                ##TSNE(n_components=2, perplexity=30.0, early_exaggeration=12.0, learning_rate=200.0, n_iter=1000, n_iter_without_progress=300, min_grad_norm=1e-07, metric=’euclidean’, init=’random’, verbose=0, random_state=None, method=’barnes_hut’, angle=0.5)
-                #tsne = TSNE(n_components=2, random_state=0, perplexity= perplexity, learning_rate= learning_rate)
-                #embedding = LargeVis.LargeVis(threads = threads)
-                #X_lds = embedding.fit_transform(X_hds)
+                    ##TSNE(n_components=2, perplexity=30.0, early_exaggeration=12.0, learning_rate=200.0, n_iter=1000, n_iter_without_progress=300, min_grad_norm=1e-07, metric=’euclidean’, init=’random’, verbose=0, random_state=None, method=’barnes_hut’, angle=0.5)
+                    #tsne = TSNE(n_components=2, random_state=0, perplexity= perplexity, learning_rate= learning_rate)
+                    #embedding = LargeVis.LargeVis(threads = threads)
+                    #X_lds = embedding.fit_transform(X_hds)
 
-                LargeVis.loadfile(output_txt_file_name)
-                #samples = -1
+                    LargeVis.loadfile(output_txt_file_name)
+                    #samples = -1
 
-                #args.perp = 20
-                #args.neigh = neigh_size
-                #print("***********neigh_size***********",args.neigh)
+                    #args.perp = 20
+                    #args.neigh = neigh_size
+                    #print("***********neigh_size***********",args.neigh)
 
-                #args.gamma = 7
-                #args.neg = neg_value
-                args.neigh = k_value
+                    #args.gamma = 7
+                    #args.neg = neg_value
+                    if iteration == 1:
+                        args.perp = para_value
+                        print("perplexity =", para_value)
+                    elif iteration == 2:
+                        args.neg = para_value
+                        print("neg = ",para_value)
+                    elif iteration == 3:
+                        args.gamma = para_value
+                        print("gamma =", para_value)
+                    else:
+                        args.neigh = para_value
+                        print("neigh =", para_value)
 
-                X_lds = Y = LargeVis.run(2, args.threads, args.samples, args.prop, args.alpha, args.trees, args.neg, args.neigh, args.gamma, args.perp)
 
-                #####  test  #####
+                    X_lds = Y = LargeVis.run(2, args.threads, args.samples, args.prop, args.alpha, args.trees, args.neg, args.neigh, args.gamma, args.perp)
 
-                # Computing the pairwise distances in the LDS for the quality assessment.
-                d_ld = scipy.spatial.distance.squareform(X=scipy.spatial.distance.pdist(X=X_lds, metric='euclidean'), force='tomatrix')
-                # transform the dataset from list to array
-                X_lds = np.array(X_lds)
-                # Displaying the LD embedding
-                #viz_test(X=X_lds, lab=labels, tit='LargeVis ($neigh_size={neigh_size}$)'.format(neigh_size=neigh_size))
+                    #####  test  #####
 
-                elapsed_time = time.time() - start_time
-                print("**************Finished in : " + str(elapsed_time) + " seconds****************")
+                    # Computing the pairwise distances in the LDS for the quality assessment.
+                    d_ld = scipy.spatial.distance.squareform(X=scipy.spatial.distance.pdist(X=X_lds, metric='euclidean'), force='tomatrix')
+                    # transform the dataset from list to array
+                    X_lds = np.array(X_lds)
+                    # Displaying the LD embedding
+                    #viz_test(X=X_lds, lab=labels, tit='LargeVis ($neigh_size={neigh_size}$)'.format(neigh_size=neigh_size))
 
-                print("Computing the DR quality of the result of LargeVis with k_value = {k_value}".format(k_value=k_value))
-                rnxk, auc_rnx = eval_dr_quality(d_hd=d_hd, d_ld=d_ld)
-                print("AUC score", auc_rnx)
-                print("*")
-                #print("Computing the KNN gain of the result of t-SNE with threshold perplexity = {perplexity}".format(perplexity=perplexity))
-                #kg, auc_kg = knngain(d_hd=d_hd, d_ld=d_ld, labels=labels)
-                # Updating the lists for viz_qa
-                L_rnx.append(rnxk)
-                #L_kg.append(kg)
-                Ltime.append("{running_time} ($k_value= {k_value}$)".format(running_time = elapsed_time, k_value = k_value))
-                Lleg_rnx.append("{a} ($k_value= {k_value}$)".format(a=int(round(auc_rnx*1000))/1000.0, k_value= k_value))
-                #Lleg_kg.append("{a} t-SNE ($n_neighbors= {n_neighbors}$)".format(a=int(round(auc_kg*1000))/1000.0, n_neighbors= n_neighbors))
-                Lls.append('solid')
-            list_L_rnx = L_rnx[-3:]
-            list_Lleg_rnx = Lleg_rnx[-3:]
-            try:
-                name = 'k_value_iteration_' + str(iteration) + '_round_' + str(round_mark)
-                #print("name", name)
-                viz_qa(path=path, name=name, Ly=list_L_rnx, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=list_Lleg_rnx, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='DR quality', xlabel='K_value_size $K$', ylabel='$R_{NX}(K)$')
+                    elapsed_time = time.time() - start_time
+                    print("**************Finished in : " + str(elapsed_time) + " seconds****************")
 
-            except:
-                name = 'k_value_iteration_' + str(iteration) + '_time_' + str(start_time)
-                #print("name", name)
-                viz_qa(path=path, name=name, Ly=list_L_rnx, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=list_Lleg_rnx, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='DR quality', xlabel='K_value_size $K$', ylabel='$R_{NX}(K)$')
+                    print("Computing the DR quality of the result of LargeVis with mark = {mark}".format(mark=para_value))
+                    rnxk, auc_rnx = eval_dr_quality(d_hd=d_hd, d_ld=d_ld)
+                    print("AUC score", auc_rnx)
+                    print("*")
+                    #print("Computing the KNN gain of the result of t-SNE with threshold perplexity = {perplexity}".format(perplexity=perplexity))
+                    #kg, auc_kg = knngain(d_hd=d_hd, d_ld=d_ld, labels=labels)
+                    # Updating the lists for viz_qa
+                    L_rnx.append(rnxk)
+                    #L_kg.append(kg)
+                    Ltime.append("{running_time} (${mark}= {value}$)".format(running_time = elapsed_time, mark = mark, value = para_value))
+                    Lleg_rnx.append("{a} (${mark}= {value}$)".format(a=int(round(auc_rnx*1000))/1000.0, mark = mark, value= para_value))
+                    #Lleg_kg.append("{a} t-SNE ($n_neighbors= {n_neighbors}$)".format(a=int(round(auc_kg*1000))/1000.0, n_neighbors= n_neighbors))
+                    Lls.append('solid')
+                list_L_rnx = L_rnx[-3:]
+                list_Lleg_rnx = Lleg_rnx[-3:]
+                try:
+                    name = str(mark) + '_iteration_' + str(iteration) + '_round_' + str(round_mark)
+                    #print("name", name)
+                    viz_qa(path=path, name=name, Ly=list_L_rnx, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=list_Lleg_rnx, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='DR quality', xlabel=str(mark) + '_size $K$', ylabel='$R_{NX}(K)$')
+
+                except:
+                    name = str(mark) + '_iteration_' + str(iteration) + '_time_' + str(start_time)
+                    #print("name", name)
+                    viz_qa(path=path, name=name, Ly=list_L_rnx, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=list_Lleg_rnx, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='DR quality', xlabel=str(mark) + '_size $K$', ylabel='$R_{NX}(K)$')
 
             #viz_test(X=X_lds, lab=labels, tit='LargeVis ($perplexity={perplexity}$)'.format(perplexity=perplexity))
         #print("Lleg_rnx",Lleg_rnx)
