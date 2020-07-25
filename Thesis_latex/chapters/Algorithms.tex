@@ -96,13 +96,48 @@ As we can observe from the image above, the dimension reduction result is satisf
 \noindent It can be observed from the figure that as the dimension increases, most of the data points are clustered near the surface of the sphere, and the distance distribution from the point $x_i$ is extremely uneven. If this distance relationship is directly retained to a low dimension, there will be a crowding problem.
 
 \section{T-SNE}
+Draw a random sample with a capacity of $N$ from the normal population. If the mean of the normal population is $μ$, the variance is $\sigma^2$. The mean of the random sample is $\bar{x}$, and the variance is $s^2=  \frac {1}{N−1} \sum ^N_{i=1} (x_i−\bar{x})^2$, and the random variable t can be expressed as:
 
+\begin{equation*}
+    {t} =  \frac {\bar{x} - \mu}{s / \sqrt{N}} 
+\end{equation*}
 
+\noindent $t$ satisfies the t distribution with n−1 degrees of freedom, written as, $t∼t(n−1)$. t distribution is a typical long-tailed distribution. It is relatively gentle at both ends of the tail, which has obvious advantages when dealing with small samples and abnormal points.
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[scale=0.6]{images/image_t-distribution.png}
+\caption{normal distribution and t distribution with and with out outliers}
+\label{fig:label}
+\end{figure}
+
+\noindent From the graph 2.4, it can be easily observed that when there are no outliers, the fitting result of t distribution and Gaussian distribution are basically consistent. In the second picture, there are some abnormal points. Because the tail of the Gaussian distribution is low, it is more sensitive to abnormal points. In order to take care of these abnormal points, the fitting result of the Gaussian distribution deviates from the location of most samples, and the variance is also large. In contrast, the tail of the t distribution is relatively high and it is not sensitive to outliers, that ensure its robustness, so its fitting results are more reasonable, and the overall characteristics of the data are better captured.
+
+\noindent With the t distribution now, for points that are close in high-dimensional space, in order to satisfy $p_i_j$=$q_i_j$, the distance in low-dimensional space needs to be slightly smaller; and for points that are far apart in high-dimensional space, in order to satisfy $p_i_j$=$q_i_j$, in low-dimensional space The distance needs to be farther. Then, We redefine the weight function from symmetric SNE: 
+
+\begin{equation*}
+    {w_i_j} =  \frac {1}{1+d_i_j^2} 
+\end{equation*}
+
+\noindent Barnes-Hut t-SNE has optimized the speed of traditional t-SNE, and it has some differences from traditional t-SNE:\\
+
+\noindent 1. the gradient calculation algorithm uses Barnes-Hut approximation running in O(NlogN) time while the original T-SNE algorithm in O($N^2$) time. The exact algorithm should be used when nearest-neighbor errors need to be better than 3$\%$
+
+\noindent 2.Barnes-Hut only works when the target dimension is 3 or less. Focus on 2D visualization.
+
+\noindent 3. Barnes-Hut is an approximation. Use the angle parameter to control the approximation\\
+
+\noindent Since the result from these two algorithm have similar accuracy and Barnes-Hut T-SNE is much faster than another. This thesis will focus the performance and characteristics of it.
 
 \chapter{LargeVis}
+\section{KNN tree}
 
+LargeVis takes a different approach: it re-uses a lot of the same definitions as t-SNE, but makes sufficient modifications so that it’s possible to use stochastic gradient descent.\\
 
-testtesttest\\
+disadvantages of T-SNE\\
+\\
+modifications from T-SNE\\
 
 \chapter{Umap}
 
