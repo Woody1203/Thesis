@@ -60,7 +60,7 @@
 
 ########################################################################################################
 ########################################################################################################
-import numpy as np,pandas as pd, numba, sklearn.decomposition, scipy.spatial.distance, matplotlib.pyplot as plt, matplotlib, sklearn.datasets
+import numpy as np,pandas as pd, itertools, numba, sklearn.decomposition, scipy.spatial.distance, matplotlib.pyplot as plt, matplotlib, sklearn.datasets
 from sklearn.manifold import TSNE
 import seaborn as sns
 from pandas import read_csv
@@ -822,6 +822,24 @@ def open_dataset_ccs():
     dataset = pd.read_excel(io = url, sheetname=0, header=0)
     # print(dataset.head())
     return dataset
+
+def make_heatmap(df, path, dataset_name, variable_target, variable1, variable2):
+
+    # print(heatmap1_data.head())
+    heatmap_image = sns.heatmap(df, annot=True, cmap="YlGnBu")
+    # cmap="YlGnBu"
+    # plt.show()
+
+    figure = heatmap_image.get_figure()
+    # figure.savefig('svm_conf.png', dpi=400)
+
+    save_results_to = path + str(dataset_name) +"_"+ str(variable_target) +"_"+ str(variable1) +"_"+ str(variable2)
+    figure.savefig(save_results_to +'_heatmap.png')
+    figure.clf()
+
+
+
+    # plt.show()
 ####  test
 
 # def open_dataset_LFW():
@@ -1053,7 +1071,8 @@ if __name__ == '__main__':
     init = 'ran'
     # number of threads
     threads_list = [1, 2, 4]
-    path = 'C:/Users/15754/Desktop/LDATE2990 - Master Thesis/Project/results/LargeVis/glass/graphs_iteration/0722/'
+    path = r'C:/Users/15754/Desktop/LDATE2990 - Master Thesis/Project/results/datasets/LFW/'
+    path_test = r'C:/Users/15754/Desktop/LDATE2990 - Master Thesis/Project/results/datasets/LFW/'
     # List of the theta thresholds to employ with cat-SNE.
     Ltheta = [0.7, 0.8, 0.9]
     #round = 1
@@ -1065,6 +1084,8 @@ if __name__ == '__main__':
     list_L_rnx,list_Lleg_rnx = [], []
     Ltime = []
     Lls = []
+    List_time = []
+    List_auc = []
     Lmedw = [1.5, 1.0, 1.0]
     Lsdots = [14, 12, 12]
     #perplexity_gourp = [13,25,30]
@@ -1102,10 +1123,15 @@ if __name__ == '__main__':
     tot_umap_spread_group = [0.1,0.5,1.0,3.0,5.0,10.0] # default = 1.0
     tot_umap_negative_sample_rate_group = [3,5,10,30, 50] # default = 5
 
-    tot_umap_n_neighbors_group_test = [2]# default = 15
-    tot_umap_min_dist_group_test = [0.0, 0.1]# default = 0.1
-    tot_umap_spread_group_test = [0.1,0.5] # default = 1.0
-    tot_umap_negative_sample_rate_group_test = [3]
+    tot_umap_n_neighbors_group_test = [5,15]# default = 15
+    tot_umap_min_dist_group_test = [ 0.1, 0.5]# default = 0.1
+    tot_umap_spread_group_test = [1.0,7.0] # default = 1.0
+    tot_umap_negative_sample_rate_group_test = [5,10] # default = 5
+
+    umap_n_neighbors_default = 15
+    umap_min_dist_default = 0.1
+    umap_spread_default = 1.0
+    umap_negative_sample_rate_default = 5
 
     #
 
@@ -1151,6 +1177,9 @@ if __name__ == '__main__':
 
                     if min_dist_value > spread_value:
                         continue
+
+                    temp_list1 = []
+                    temp_list2 = []
 
                     # 0722
                     # give value for each parameter
@@ -1268,6 +1297,8 @@ if __name__ == '__main__':
 
                     Ltime.append("{running_time} with n_neighbors = {n_neighbors}, min_dist = {min_dist}, spread = {spread}, negative_sample_rate = {negative_sample_rate}".format(running_time = elapsed_time, n_neighbors = n_neighbors_value, min_dist = min_dist_value, spread = spread_value, negative_sample_rate = negative_sample_rate_value))
                     Lleg_rnx.append("AUC_score {AUC_score} with n_neighbors = {n_neighbors}, min_dist = {min_dist}, spread = {spread}, negative_sample_rate = {negative_sample_rate}".format(AUC_score = auc_value, n_neighbors = n_neighbors_value, min_dist = min_dist_value, spread = spread_value, negative_sample_rate = negative_sample_rate_value))
+                    List_time.append([n_neighbors_value, min_dist_value, spread_value, negative_sample_rate_value, elapsed_time])
+                    List_auc.append([n_neighbors_value, min_dist_value, spread_value, negative_sample_rate_value, auc_value])
                     #Lleg_kg.append("{a} t-SNE ($n_neighbors= {n_neighbors}$)".format(a=int(round(auc_kg*1000))/1000.0, n_neighbors= n_neighbors))
                     Lls.append('solid')
 
@@ -1294,14 +1325,79 @@ if __name__ == '__main__':
         #print("Lleg_rnx",Lleg_rnx)
         #print("Rtime", Ltime)
     #print("L_rnx",L_rnx)
-    print("final Lleg_rnx",Lleg_rnx)
-    print("********************* ")
-    print("final Rtime", Ltime)
-    print("********************* ")
+    # print("final Lleg_rnx",Lleg_rnx)
+    # print("********************* ")
+    # print("final Rtime", Ltime)
+    # print("********************* ")
     print("Best score:{:.3f}".format(best_auc_score))
     print("Best parameters:{}".format(best_parameters))
     end_end_time = time.time() - start_start_time
     print("**************Finished in : " + str(end_end_time/3600.0) + " hours****************")
+
+    df_time = pd.DataFrame (List_time, columns=['n_neighbors', 'min_dist', 'spread', 'negative_sample_rate', 'elapsed_time'])
+    df_auc = pd.DataFrame (List_auc, columns=['n_neighbors', 'min_dist', 'spread', 'negative_sample_rate', 'auc_value'])
+
+
+
+    # print(df_time.head())
+    # print(df_auc.head())
+
+    # pandas pivot
+    variable_target1 = 'auc_value'
+    variable_target2 = 'elapsed_time'
+    variable1 = 'n_neighbors'
+    variable2 = 'min_dist'
+    variable3 = 'spread'
+    variable4 = 'negative_sample_rate'
+    dataset_name = 'LFW'
+
+    df_time.to_csv (path + str(dataset_name) + '_time_results.csv', index = False, header=True)
+    df_auc.to_csv (path + str(dataset_name) + '_auc_results.csv', index = False, header=True)
+
+
+    mark = 0
+    iterable = [variable1, variable2, variable3, variable4]
+    output = itertools.combinations(iterable, 2)
+
+
+    # print(output)
+
+    for variable1, variable2 in output:
+        # print(variable1,"********", variable2)
+        for df in (df_auc, df_time):
+
+            # if variable1 == variable2:
+            #     continue
+
+            mark += 1
+            # print(mark)
+            if (mark % 2) == 0:
+                # print("mark = ", mark)
+                variable_target = 'elapsed_time'
+            else:
+                # print("mark = ", mark)
+                variable_target = 'auc_value'
+
+        # for variable_target in ('auc_value','elapsed_time'):
+
+            # print("df = ", df.head())
+            # print("variable_target = ", variable_target)
+            # print("variable1 = ", variable1)
+            # print("variable2 = ", variable2)
+
+            pivot_dataframe = pd.pivot_table(df, values=variable_target,
+                                 index=variable1,
+                                 columns=variable2)
+
+            make_heatmap(pivot_dataframe, path, dataset_name, variable_target, variable1, variable2)
+
+
+
+    # save dataframe to path
+
+
+
+    # print(df_auc.n_neighbors)
 
 
 
