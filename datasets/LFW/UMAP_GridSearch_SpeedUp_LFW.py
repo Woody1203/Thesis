@@ -1072,7 +1072,7 @@ if __name__ == '__main__':
     # number of threads
     threads_list = [1, 2, 4]
     path = r'C:/Users/15754/Desktop/LDATE2990 - Master Thesis/Project/results/datasets/LFW/'
-    path_test = r'C:/Users/15754/Desktop/LDATE2990 - Master Thesis/Project/results/datasets/LFW/'
+    # path_test = r'C:/Users/15754/Desktop/LDATE2990 - Master Thesis/Project/results/datasets/LFW/'
     # List of the theta thresholds to employ with cat-SNE.
     Ltheta = [0.7, 0.8, 0.9]
     #round = 1
@@ -1118,10 +1118,10 @@ if __name__ == '__main__':
     # tot_tsne_n_iter_group_test = [1000, 1500]
     # tot_tsne_early_exaggeration_group_test = [12]
 
-    tot_umap_n_neighbors_group = [5, 10, 15, 30, 50, 100, 200]# default = 15
+    tot_umap_n_neighbors_group = [5, 15, 50, 100, 200]# default = 15
     tot_umap_min_dist_group = [0.01, 0.1, 0.5, 0.8, 0.99]# default = 0.1
-    tot_umap_spread_group = [0.1,0.5,1.0,3.0,5.0,10.0] # default = 1.0
-    tot_umap_negative_sample_rate_group = [3,5,10,30, 50] # default = 5
+    tot_umap_spread_group = [0.1,1.0,3.0,5.0,10.0] # default = 1.0
+    tot_umap_negative_sample_rate_group = [3, 5, 10, 30, 50] # default = 5
 
     tot_umap_n_neighbors_group_test = [5,15]# default = 15
     tot_umap_min_dist_group_test = [ 0.1, 0.5]# default = 0.1
@@ -1334,15 +1334,6 @@ if __name__ == '__main__':
     end_end_time = time.time() - start_start_time
     print("**************Finished in : " + str(end_end_time/3600.0) + " hours****************")
 
-    df_time = pd.DataFrame (List_time, columns=['n_neighbors', 'min_dist', 'spread', 'negative_sample_rate', 'elapsed_time'])
-    df_auc = pd.DataFrame (List_auc, columns=['n_neighbors', 'min_dist', 'spread', 'negative_sample_rate', 'auc_value'])
-
-
-
-    # print(df_time.head())
-    # print(df_auc.head())
-
-    # pandas pivot
     variable_target1 = 'auc_value'
     variable_target2 = 'elapsed_time'
     variable1 = 'n_neighbors'
@@ -1350,9 +1341,21 @@ if __name__ == '__main__':
     variable3 = 'spread'
     variable4 = 'negative_sample_rate'
     dataset_name = 'LFW'
+    algorithm = 'Umap'
 
-    df_time.to_csv (path + str(dataset_name) + '_time_results.csv', index = False, header=True)
-    df_auc.to_csv (path + str(dataset_name) + '_auc_results.csv', index = False, header=True)
+    df_time = pd.DataFrame (List_time, columns=[variable1, variable2, variable3, variable4, variable_target2])
+    df_auc = pd.DataFrame (List_auc, columns=[variable1, variable2, variable3, variable4, variable_target1])
+
+
+
+    # print(df_time.head())
+    # print(df_auc.head())
+
+    # pandas pivot
+
+
+    df_time.to_csv (path + str(dataset_name) + str(algorithm) + '_time_results.csv', index = False, header=True)
+    df_auc.to_csv (path + str(dataset_name) + str(algorithm) + '_auc_results.csv', index = False, header=True)
 
 
     mark = 0
