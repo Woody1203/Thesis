@@ -11,7 +11,7 @@ some related work and background
 Given N observations of some high dimensional data, for any pair, $x_i$ and $x_j$, SNE defines the similarity (aka an affinity or weight) between them, using a Gaussian kernel function:
 
 \begin{equation*}
-    {v_{i\mid j}} = \exp {(-\beta_i r^2_{ij})} 
+    {v_{j\mid i}} = \exp {(-\beta_i r^2_{ij})} 
 \end{equation*}
 
 \noindent Where $r_i_j$ is the distance between $x_i$ and $x_j$ and $\beta_i$ must be determined by some method. The notation of $v_{i \mid j}$ rather than $v_i_j$, is to indicate that this quantity is not symmetric, i.e. $v_{i \mid j} \neq v_{j \mid i}$. This notation is from the conditional versus joint probability definitions used in symmetric SNE (see below). The $r_i_j$ notation indicates that the distances are symmetric.\\
@@ -30,7 +30,7 @@ Given N observations of some high dimensional data, for any pair, $x_i$ and $x_j
     {{w_i_j} = \exp {(-d^2_{ij})} }
 \end{equation*}
 
-\noindent $d_i_j$ is the Euclidean distance between $y_i$ and $y_j$. There is no $\beta$ in this weight definition so these weights are symmetric. The output probabilities, $q_{j\mid i}$ are calculated from $w_i_j$ in the same way that we go from ${v_{j\mid i}}$ to ${p_{j\mid i}}$, again creating N probability distributions. Due to normalizing by rows, the $q_{j\mid i}$ are asymmetric despite the symmetric weights they are generated from.\\
+\noindent $d_i_j$ is the Euclidean distance between $y_i$ and $y_j$ as the mapping points of high-dimensional data points $x_i$ and $x_j$ in low-dimensional space, respectively. There is no $\beta$ in this weight definition so these weights are symmetric. The output probabilities, $q_{j\mid i}$ are calculated from $w_i_j$ in the same way that we go from ${v_{j\mid i}}$ to ${p_{j\mid i}}$, again creating N probability distributions. Due to normalizing by rows, the $q_{j\mid i}$ are asymmetric despite the symmetric weights they are generated from.\\
 
 \noindent Therefore, The SNE cost function could be defined as the sum of the Kullback-Leibler divergences of the N distributions:
 
@@ -38,7 +38,13 @@ Given N observations of some high dimensional data, for any pair, $x_i$ and $x_j
     {C_S_N_E} = {\sum_i KL(P_i \mid \mid Q_i)} =  { {\sum_i^N} {\sum_j^N} {p_{j\mid i}} \log \frac{p_{j\mid i}}{q_{j\mid i}} }
 \end{equation*}
 
-Because KL distance is an asymmetric scale. The purpose of minimizing the cost function is to make the values of $p_{j∣i}$ and $q_{j∣i}$ as close as possible,  that is, the similarity of points in the low-dimensional space is consistent with the similarity of points in the high-dimensional space. But it can be trimmed from the form of the cost function. When $p_{j∣i}$ is relatively bigger and $q_{j∣i}$  is relatively smaller, the cost is higher; when $p_{j∣i}$ is smaller and $q_{j∣i}$ is bigger, the cost is lower. This means when two data points in a high-dimensional space are relatively close, if they are mapped to a low-dimensional space and are farther apart, then they will get a high penalty, which is of course no problem. Conversely, when the two data points in the high-dimensional space are farther apart, if they are mapped to the low-dimensional space, they will get a very low penalty value. This is a problem, and it should be a higher penalty. In other words, the cost function of SNE pays more attention to the local structure rather than global impact.
+\noindent The gradient of $y_i$ of the SNE cost function is as follows:
+
+\begin{equation*}
+\frac{\partial C_{SNE}}{\partial y_i} = 2\sum_j(p_{j \mid i} - q_{j \mid i} + p_{i \mid j} - q_{i \mid j} )(y_i - y_j)
+\end{equation*}
+
+\noindent Because KL distance is an asymmetric scale. The purpose of minimizing the cost function is to make the values of $p_{j∣i}$ and $q_{j∣i}$ as close as possible,  that is, the similarity of points in the low-dimensional space is consistent with the similarity of points in the high-dimensional space. But it can be trimmed from the form of the cost function. When $p_{j∣i}$ is relatively bigger and $q_{j∣i}$  is relatively smaller, the cost is higher; when $p_{j∣i}$ is smaller and $q_{j∣i}$ is bigger, the cost is lower. This means when two data points in a high-dimensional space are relatively close, if they are mapped to a low-dimensional space and are farther apart, then they will get a high penalty, which is of course no problem. Conversely, when the two data points in the high-dimensional space are farther apart, if they are mapped to the low-dimensional space, they will get a very low penalty value. This is a problem, and it should be a higher penalty. In other words, the cost function of SNE pays more attention to the local structure rather than global impact.
 
 \section{Symmetric SNE}
 In Symmetric SNE, the input probability matrix is symmetrized by averaging pj|i and pi|j and then re-normalized over all pairs of points, to create a single (joint) probability distribution, $p_i_j$:
@@ -59,15 +65,21 @@ In Symmetric SNE, the input probability matrix is symmetrized by averaging pj|i 
     {C_S_S_N_E} = {\sum_i KL(P \mid \mid Q)} =  { {\sum_i^N} {\sum_j^N} {p_{i j}} \log \frac{p_{i j}}{q_{i j}} }
 \end{equation*}
 
+\noindent The gradient turn out to be: 
+
+\begin{equation*}
+\frac{\partial C_{SSNE}}{\partial y_i} = 4\sum_j(p_i_j - q_i_j)(y_i - y_j)
+\end{equation*}
+
 \noindent In the end, the result for UPS database, which has five kind of image of hand writing can be seen as below:
 
-\begin{figure}[ht]
+% \begin{figure}[ht]
 
-\centering
-\includegraphics[scale=1.5]{images/image_SNE.png}
-\caption{result of SNE algorithm for UPS dataset}
-\label{fig:label}
-\end{figure}
+% \centering
+% \includegraphics[scale=1.5]{images/image_SNE.png}
+% \caption{result of SNE algorithm for UPS dataset}
+% \label{fig:label}
+% \end{figure}
 
 \section{The Crowding Problem}
 
@@ -102,7 +114,7 @@ Draw a random sample with a capacity of $N$ from the normal population. If the m
     {t} =  \frac {\bar{x} - \mu}{s / \sqrt{N}} 
 \end{equation*}
 
-\noindent $t$ satisfies the t distribution with n−1 degrees of freedom, written as, $t∼t(n−1)$. t distribution is a typical long-tailed distribution. It is relatively gentle at both ends of the tail, which has obvious advantages when dealing with small samples and abnormal points.
+\noindent $t$ satisfies the t distribution with n−1 degrees of freedom, written as, $t∼t(n−1)$. t distribution is a typical long-tailed distribution. It is relatively gentle at both ends of the tail, which has obvious advantages when dealing with small samples and abnormal points.\\
 
 \begin{figure}[ht]
 
@@ -112,7 +124,7 @@ Draw a random sample with a capacity of $N$ from the normal population. If the m
 \label{fig:label}
 \end{figure}
 
-\noindent From the graph 2.4, it can be easily observed that when there are no outliers, the fitting result of t distribution and Gaussian distribution are basically consistent. In the second picture, there are some abnormal points. Because the tail of the Gaussian distribution is low, it is more sensitive to abnormal points. In order to take care of these abnormal points, the fitting result of the Gaussian distribution deviates from the location of most samples, and the variance is also large. In contrast, the tail of the t distribution is relatively high and it is not sensitive to outliers, that ensure its robustness, so its fitting results are more reasonable, and the overall characteristics of the data are better captured.
+\noindent From the figure 2.3, it can be easily observed that when there are no outliers, the fitting result of t distribution and Gaussian distribution are basically consistent. In the second picture, there are some abnormal points. Because the tail of the Gaussian distribution is low, it is more sensitive to abnormal points. In order to take care of these abnormal points, the fitting result of the Gaussian distribution deviates from the location of most samples, and the variance is also large. In contrast, the tail of the t distribution is relatively high and it is not sensitive to outliers, that ensure its robustness, so its fitting results are more reasonable, and the overall characteristics of the data are better captured.\\
 
 \noindent With the t distribution now, for points that are close in high-dimensional space, in order to satisfy $p_i_j$=$q_i_j$, the distance in low-dimensional space needs to be slightly smaller; and for points that are far apart in high-dimensional space, in order to satisfy $p_i_j$=$q_i_j$, in low-dimensional space The distance needs to be farther. Then, We redefine the weight function from symmetric SNE: 
 
@@ -120,24 +132,138 @@ Draw a random sample with a capacity of $N$ from the normal population. If the m
     {w_i_j} =  \frac {1}{1+d_i_j^2} 
 \end{equation*}
 
-\noindent Barnes-Hut t-SNE has optimized the speed of traditional t-SNE, and it has some differences from traditional t-SNE:\\
+\section{Barnes-Hut t-SNE(BH t-SNE)}
 
-\noindent 1. the gradient calculation algorithm uses Barnes-Hut approximation running in O(NlogN) time while the original T-SNE algorithm in O($N^2$) time. The exact algorithm should be used when nearest-neighbor errors need to be better than 3$\%$
+BH t-SNE has some improvements comparing with t-SNE algorithm with the help of tree-based algorithm, including two parts: one is the use of kNN graphs to represent the similarity of points in the high-dimensional space; the other is the optimization of the gradient solution process. The gradient calculation is divided into two parts of gravity and repulsion, and some optimization techniques are also used.
 
-\noindent 2.Barnes-Hut only works when the target dimension is 3 or less. Focus on 2D visualization.
+\subsection{kNN graph for the similarity in HD space}
 
-\noindent 3. Barnes-Hut is an approximation. Use the angle parameter to control the approximation\\
+\noindent In t-sne, the overall distance distribution relationship in the high-dimensional space is expressed in the following form:
+
+\begin{equation*}
+    {v_{j\mid i}} = \exp {(-\beta_i r^2_{ij})} 
+\end{equation*}
+
+\begin{equation*}
+    {p_{j\mid i}} = \frac {v_{j\mid i}} {\sum_k^N v_{k\mid i}}
+\end{equation*}
+
+\begin{equation*}
+    {p_{i j}} = \frac {p_{i\mid j} + p_{j\mid i}} {2N}
+\end{equation*}\\
+
+\noindent These three formulas means every data point need to calculate the variance considering all other points. But in fact, the probability $p_i_j$ that two distant points are neighbors to each other is very small and almost negligible. This makes the efficiency of t-SNE is significantly reduced when processing large-scale high-dimensional data.\\
+
+\noindent Therefore, when constructing a distance similarity relationship for a point in a high-dimensional space, it is not necessary to consider every node in the graph, only a number of similar nodes. Here we consider the ⌊3$u$⌋ points closest to the point $x_i$, where $u$ is the perplexity of the conditional probability distribution around the point $x_i$, and only consider the set of these points, which will decrease the amount of calculation. The BH t-SNE algorithm uses a VP tree (vantage-point tree) to construct this kNN graph, and an accurate kNN graph can be obtained within O ($uNlogN$) time complexity.\\
+
+\subsection{Approximation of repulsion in gradient}
+
+When understanding the physical meaning of t-SNE gradient, the gradient can be regarded as the resultant effect of all other points on $y_i$. If $Z$ is set as $Z = \sum_{k \neq l} (1+ \mid y_k−y_l \mid ^2)^{-1}$, then the gradient could be transformed by this feature:
+
+\begin{equation*}
+\begin{aligned}
+\frac{\partial C_{SSNE}}{\partial y_i} &= {4\sum_j(p_i_j - q_i_j)(y_i - y_j)(1 + \mid y_i - y_j \mid ^ 2) ^{-1}}\\
+&= {4\sum_j(p_i_j - q_i_j) (1 + \mid \mid y_i - y_j \mid \mid ^ 2)}
+\end{aligned}
+\end{equation*}
+
+\begin{equation*}
+\begin{aligned}
+\frac{\partial C_{SSNE}}{\partial y_i} &= {4(F_{attraction} + F_{repulsion})}\\
+&= 4({\sum_{i \neq j}p_i_j q_i_j Z (y_i - y_j)} - {\sum_{i \neq j}q_i_j^2 Z (y_i - y_j)}) 
+\end{aligned}
+\end{equation*}
+
+\noindent It can be seen that after decomposing the gradient into two parts of attraction and repulsion, the first part is easier to calculate since the $q_i_j Z = 1 + \mid y_i - y_j \mid ^ 2 $ could use the approximation above, which only considers the nearest neighbor nodes, while ignoring distant nodes with time complexity is $O(uN)$. However, there is still a large amount of calculation to calculate repulsion with time complexity $O(N^2)$ because the distribution of $P$ and $Q$ is different, but there are still some optimization techniques to simplify this calculation.\\
+
+\noindent If there are three data points ($y_i,y_j,y_k$) as shown below, their distance relationship can be summarized as $y_i−y_j ≈ y_i−y_k >> y_j−y_k$, the repulsion of $y_j$ and $y_k$ to $y_i$ is approximately equal.
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[scale=0.6]{images/image_point_region_1.PNG}
+\caption{normal distribution and t distribution with and with out outliers}
+\label{fig:label}
+\end{figure}
+
+\noindent This situation is very common in low-dimensional space, and even the repulsive force of each point in a certain area can be approximated by the same value. If a point is given arbitrarily, we just need to calculate the repulsion between given point and the centroid of the data points within the certain area, and use the optimization method just now to calculate the total repulsion for them. Of course, not all regions meet this approximate condition. Here, the Barnes-Hut algorithm is used to search and verify the point-region pairs that meet the approximate condition.\\
+
+\subsection{From point-area to area-area}
+
+\noindent In the above approximation, we consider the approximation of the repulsive force between a point and an area. In fact, we can further optimize and consider the approximation of the repulsive force between one area and another area.
+\\
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[name1]{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=5cm\textwidth]{images/image_point_region_2.PNG}}
+\subfigure[name2]{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=5cm\textwidth]{images/image_region_region_1.PNG}}
+\caption{Main name}
+\label{Fig.main}
+\end{figure}
 
 \noindent Since the result from these two algorithm have similar accuracy and Barnes-Hut T-SNE is much faster than another. This thesis will focus the performance and characteristics of it.
 
+% 再补两个通过bh t-SNE 和 t-SNE 的效果图
+
 \chapter{LargeVis}
-\section{KNN tree}
 
-LargeVis takes a different approach: it re-uses a lot of the same definitions as t-SNE, but makes sufficient modifications so that it’s possible to use stochastic gradient descent.\\
 
-disadvantages of T-SNE\\
-\\
-modifications from T-SNE\\
+
+\noindent  Although T-SNE works well on small-scale data, there are still some disadvantages of T-SNE:\\
+
+\noindent 1. The efficiency of t-SNE is significantly reduced when processing large-scale high-dimensional data (including BH T-SNE)\\
+
+\noindent 2.The parameters of t-SNE are sensitive to different data sets, which means that even finding out the proper parameters setting for T-SNE in one data set with there is a good visualization effect. However, it cannot be applied to another data set, and it takes a lot of time to find new suitable parameters.\\
+
+\noindent As can be seen from the name, the goal of LargeVis\cite{ref5} is the visualization of large-scale data sets, which takes a different approach comparing with T-SNE: it reuses many of the same definitions as t-SNE but makes sufficiently modified so that stochastic gradient descent can be used. The main improvement is the efficient algorithm for constructing kNN graphs, as well as the low-dimensional space probability calculation formula and objective function.
+
+\section{Efficient kNN graph constructing algorithm}
+
+In the BH t-SNE, for high-dimensional spatial distance similarity, it only consider several neighbor points closest to $x_i$, which is essentially a process of constructing a kNN graph. The VP(vantage-point) tree is used to construct an accurate kNN graph, but the efficiency is still not good, especially for the large-scale dataset. And LargeVis uses a more ingenious way, instead of pursuing a one-step approach, first approximate and then improve accuracy.\\
+
+\subsection{K-D tree and Random Projection Tree}
+
+There are generally three types of common methods for building KNN graph: the first type is the space-partitioning trees algorithm, the second type is the locality sensitive hashing algorithm, and the third type is the neighbor exploring techniques algorithm. Among them, k-d tree and random projection tree belong to the first type of algorithm.\\
+
+\noindent A k-d tree is a data structure that partitions a k-dimensional data space, and is essentially a binary tree. It is mainly used for searching key data in multi-dimensional space, such as range search and nearest neighbor search. The following figure shows the use of k-d trees to search for k nearest neighbors in a two-dimensional space, and then construct a kNN graph. It constructs a kd tree through a recursive process. The root node corresponds to all points in the area. After dividing the space into a left subtree and a right subtree in a certain dimension, the next level of child nodes can be obtained by repeating the splitting process of the root node. Until the number of points corresponding to all leaf nodes in the kd tree is less than a certain threshold.\\
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[scale=0.85]{images/image_largevis_k-d_tree_1.PNG}
+\caption{k-d tree for dimension 2}
+\label{fig:label}
+\end{figure}
+
+\noindent With the k-d tree, we don't have to calculate the distance between a certain point and all other points one by one to find k nearest neighbors. For example, to find the k-nearest neighbors of the red dot in the figure below, it only need to search the current subspace, and at the same time, continue to backtrack and search other subspaces of the parent node to find the k-nearest neighbors.\\
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[scale=0.85]{images/image_largevis_k-d_tree_2.PNG}
+\caption{finding k-nearest neighbors for k-d tree}
+\label{fig:label}
+\end{figure}
+
+\noindent However, the biggest problem with the k-d tree is that the way it divides the space is relatively rigid, which is strictly based on the coordinate axis. For high-dimensional data, each dimension of the high-dimensional data is used as a coordinate axis. When the data dimensionality is high, the depth of the k-d tree could be a lot also, which may also lead to the dimensionality disaster problem.\\
+
+\noindent In contrast, the way of dividing the space by random projection trees is more flexible. The basic idea of the random projection tree is similar to the k-d tree, but the way to divide the space is not according to the coordinate axis, but according to the randomly generated unit vector. Because the data in principle is on a manifold, instead of a disorderly manner. Therefore, the depth of the random projection tree is not determined by the dimensionality of the data, but depends on the dimensionality of the manifold where the data is located\cite{ref6}.\\
+
+\noindent When a random projection tree is used to find k nearest neighbors, a backtracking search method similar to the k-d tree can be used. If the accuracy of k-nearest neighbors is not high, the characteristics of the random projection tree can be used to adopt a simpler and time-saving method. That is, we can construct multiple random projection trees in parallel. Since the divided unit vectors are generated randomly, each random projection tree divides the current space differently, as shown in the following figure with two-dimensional space as an example. If the k-nearest neighbors of the red dot need to be fixed, it only need to search the subspace where it is located in different random projection trees, and finally take the union. Although this is time-consuming and space-consuming in the process of constructing a random projection tree, it is very efficient in the search phase.
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[scale=0.85]{images/image_largevis_random_projection_tree_2.PNG}
+\caption{finding k-nearest neighbors for random projection tree}
+\label{fig:label}
+\end{figure}
+
+\subsection{The neighbor’s neighbor may also be my neighbor}
 
 \chapter{Umap}
 
