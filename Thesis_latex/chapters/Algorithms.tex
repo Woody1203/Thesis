@@ -253,8 +253,6 @@ There are generally three types of common methods for building KNN graph: the fi
 
 \noindent In contrast, the way of dividing the space by random projection trees is more flexible. The basic idea of the random projection tree is similar to the k-d tree, but the way to divide the space is not according to the coordinate axis, but according to the randomly generated unit vector. Because the data in principle is on a manifold, instead of a disorderly manner. Therefore, the depth of the random projection tree is not determined by the dimensionality of the data, but depends on the dimensionality of the manifold where the data is located\cite{ref6}.\\
 
-\noindent When a random projection tree is used to find k nearest neighbors, a backtracking search method similar to the k-d tree can be used. If the accuracy of k-nearest neighbors is not high, the characteristics of the random projection tree can be used to adopt a simpler and time-saving method. That is, we can construct multiple random projection trees in parallel. Since the divided unit vectors are generated randomly, each random projection tree divides the current space differently, as shown in the following figure with two-dimensional space as an example. If the k-nearest neighbors of the red dot need to be fixed, it only need to search the subspace where it is located in different random projection trees, and finally take the union. Although this is time-consuming and space-consuming in the process of constructing a random projection tree, it is very efficient in the search phase.
-
 \begin{figure}[ht]
 
 \centering
@@ -263,7 +261,21 @@ There are generally three types of common methods for building KNN graph: the fi
 \label{fig:label}
 \end{figure}
 
+\noindent When a random projection tree is used to find k nearest neighbors, the backtracking search method is similar to the k-d tree. If the requirement of the tree's accuracy is not high, the characteristics of the random projection tree can be used to adopt a simpler and time-saving method. That is, we can construct multiple random projection trees in parallel. Since the divided unit vectors are generated randomly, each random projection tree divides the current space differently, as shown in the following figure with two-dimensional space as an example. If the k-nearest neighbors of the red dot need to be fixed, it only need to search the subspace where it is located in different random projection trees, and finally take the union. Although this is time-consuming and space-consuming in the process of constructing a random projection tree, it is very efficient in the search phase.
+
 \subsection{The neighbor’s neighbor may also be my neighbor}
+
+The idea of "neighbors' neighbors may also be my neighbors", starting from an initial nearest-neighbor graph, the algorithm iteratively refines the graph by exploring the neighbors of neighbors defined according to the current graph\cite{ref5}. It use the neighbor search algorithm to find potential neighbors, calculating the distance between the neighbor and the current point, the neighbor's neighbor and the current point, and putting them into a small root pile. Take the k nodes with the smallest distance as k nearest neighbors, and finally get an accurate kNN graph.\\
+
+\section{Low-dimensional space visualization algorithm}
+
+\subsection{Word2vec and Negative sampling}
+
+\noindent After completing the KNN graph algorithm for high dimensional space, we need to project the nodes of the graph into a low-dimensional space. In the process of low-dimensional space visualization, the idea of t-SNE is to ensure that the distance distribution P of the high-dimensional space and the distance distribution Q of the low-dimensional space are as close as possible, and use the KL distance to write the cost function and find the gradient. But the efficiency problem has not been solved well.\\
+
+\noindent In LargeVis algorithm, in order to solve the efficiency problem, a probability model is applied to it to maintain the similarity of vertices in low-dimensional space. That is, the algorithm will bring similar vertices close to each other in a low-dimensional space, and separate different vertices from each other.\\
+
+\subsection{Large-scale Information Network Embedding (LINE) and edge-sampling algorithm}
 
 \chapter{Umap}
 
