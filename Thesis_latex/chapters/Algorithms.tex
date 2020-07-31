@@ -269,13 +269,109 @@ The idea of "neighbors' neighbors may also be my neighbors", starting from an in
 
 \section{Low-dimensional space visualization algorithm}
 
-\subsection{Word2vec and Negative sampling}
-
 \noindent After completing the KNN graph algorithm for high dimensional space, we need to project the nodes of the graph into a low-dimensional space. In the process of low-dimensional space visualization, the idea of t-SNE is to ensure that the distance distribution P of the high-dimensional space and the distance distribution Q of the low-dimensional space are as close as possible, and use the KL distance to write the cost function and find the gradient. But the efficiency problem has not been solved well.\\
 
-\noindent In LargeVis algorithm, in order to solve the efficiency problem, a probability model is applied to it to maintain the similarity of vertices in low-dimensional space. That is, the algorithm will bring similar vertices close to each other in a low-dimensional space, and separate different vertices from each other.\\
+\noindent In LargeVis algorithm, in order to solve the efficiency problem, a probability model is applied to it to maintain the similarity of vertices in low-dimensional space. That is, the algorithm will bring similar vertices close to each other in a low-dimensional space, and separate different vertices from each other. It uses two models from Word2vec and negaitve sampling optimization method to 
+achieve the goal.
+
+\subsection{Word2vec and Negative sampling}
+Word embedding is a way to present word using numerical representation in order to understand the contextual meaning of the words, While word2vec provide two kind of architectures 1)Continuous Bag of-Words (CBOW) and 2)Skip-gram and combine with two methods 1)negative sampling and 2)hierarchical softmax method to obtain this representation way of each word. Skip-gram: works well with a small amount of the training data, represents well even rare words or phrases. CBOW: several times faster to train than the skip-gram, slightly better accuracy for the frequent words.
+
+\subsubsection{Two models of Word2vec}
+
+\noindent As we can see from the figure 3.4, the CBOW method, the surrounding words are used to predict the center word, so as to use the prediction result of the center word, use the Gradient Desent method to continuously adjust the vector of the surrounding words. When the training is completed, each word will be used as the central word, and the word vectors of the surrounding words are adjusted, so that the word vectors of all words in the entire text are obtained. The CBOW model performs better with a small amount of training data, and is more suitable for rare words or phrases.\\
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[scale=0.85]{images/image_largevis_word2vec.PNG}
+\caption{Two models of Word2vec}
+\label{fig:label}
+\end{figure}
+
+\noindent The Skip-gram uses the head word to predict surrounding words. In skip-gram, the prediction results of surrounding words are used, and Gradient Decent is used to continuously adjust the word vector of the central word. After all the text is traversed, the word vectors of all words in the text are obtained. The Skip-gram model is faster to train and is more suitable for frequent words or phrases.\\
+
+
+\subsubsection{Negative sampling}
+
+\noindent Negative sampling is one of the optimization techniques. If we take the Skip-gram model as an example. The idea of the Skip-gram model is to predict the context from the target word and use a context window to limit the text range. It needs to maximize the probability that the context window appears around the target word.That is to maximize $p(c∣w)=∑p(wi∣w)$. The words $w_i ∈ c$ that appear in the context window around the target word constitute a positive sample $(wi, w)$, and the words $w_j ∈ D$ that do not appear around the target word constitute a negative sample $(w_j, w)$ and the goal of this step is to maximize the probability of positive samples during the training process, while also reducing the probability of negative samples.\\
+
+\noindent Due to the large number of negative samples (words outside the context window can basically constitute negative samples), it is obviously unrealistic to directly consider all negative samples, so we can select a part of negative samples by sampling. Because some words appear frequently in the corpus and some words appear low, it is obviously not advisable to draw negative samples directly from the vocabulary. Word2vec uses a weighted sampling strategy, that is, sampling according to word frequency. High-frequency words are more likely to be sampled, and low-frequency words are less likely to be sampled.\\
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[scale=1.3]{images/image_largevis_word2vec_seperate_lines.PNG}
+\caption{Weighted sampling details}
+\label{fig:label}
+\end{figure}
+
+\noindent As we can see in figure 3.5, the upper line segment is divided by word frequency, the higher the word frequency, the longer the line segment, and the lower line segment is divided equally. We randomly place dots in the lower line segment (uniformly distributed), and according to the interval where the point falls, correspond to the upper line segment to determine the word sampled. Intuitively, in this way, words with higher word frequency are more likely to be sampled, and words with lower word frequency are less likely to be sampled.After adding negative sampling optimization, the form of the objective function becomes:
+
+\begin{equation*}
+    {log \sigma(v_{w_c}^T \cdot v_w)} + {\sum^k_{\substack{i=1\\ {E_{w_i} \sim P_n(f)}}}log \sigma(-v_{w_c}^T \cdot v_w)}
+\end{equation*}
+
+\noindent Where $w$ represents the target word, $w_c$ represents the word in the context window around the target word (positive sample), $w_i$ represents the word that does not appear in the context window (negative sample), $k$ represents the number of negative samples extracted, and $P_n(f)$ is Used for noise distribution generated by negative samples, $f$ represents word frequency, $P_n(f)∝f^{0.75}$. The exponent is suggested to set as 0.75\cite{ref7}, this makes the data closer to the center, which means the 
+higher values tend to lower and the lower values do the opposite in order to avoid high frequent words appearing all the time.
 
 \subsection{Large-scale Information Network Embedding (LINE) and edge-sampling algorithm}
+
+\noindent There are mainly two outstanding contributions for LINE: one is that it can adapt to various types (undirected edges or directed edges, weighted and unweighted) large-scale (million-level nodes, billion-level edges) networks, and can It captures the first-order and second-order similarities in the network very well; the second is to propose a very powerful edge-sampling algorithm, which greatly reduces the time complexity of LINE. After using the edge-sampling algorithm, the time complexity and The number of edges in the network is linear. The efficiency of LargeVis also benefits from LINE and its edge sampling algorithm.\\
+
+\noindent The first-order similarity refers to the point-to-point similarity between two nodes in the network, specifically the weight of the edge between the nodes (if the point does not have an edge, the first-order similarity is 0); the second-order similarity Sex means that if nodes share similar neighbor nodes, then the two tend to be similar. For example, in the case shown in the figure below, the weight of the edge is expressed in thickness:
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[scale=0.85]{images/image_largevis_line_1.PNG}
+\caption{edge sampling example}
+\label{fig:label}
+\end{figure}
+
+\noindent The first-order similarity between node 8 and node 9 in the graph is higher because the weight of the directly connected edges is higher. Node 1 and node 7 have most of the same neighbors, so the second-order similarity between the two is very high. The idea of edge sampling algorithm comes from the negative sampling optimization technique used by Mikolov in word2vec. It not only improves the efficiency of training, but also solves the problem of sharp increase in gradient caused by the weighted edge in the network representation during the training process.\\
+
+\subsection{Visualization algorithm}
+
+\noindent The application of negative sampling to words is mentioned above. In fact, it is similar in the network. We can regard the current center point as the target word, and its neighbor nodes as words appearing in the context window, then the center point and its neighbor nodes That is, it constitutes a positive sample, while the center point and non-neighboring points constitute a negative sample.
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[scale=0.85]{images/image_largevis_ld_visulization_1.PNG}
+\caption{edge sampling example}
+\label{fig:label}
+\end{figure}
+
+\noindent As a small part of the kNN diagram shown above, if the blue point is the center point, each green point and the blue point can form a positive sample, and each yellow point and the blue point form a negative sample. How to map the structural relationship in this kNN graph to a low-dimensional space? Intuitively, in the low-dimensional space, the node pairs in the positive sample should be clustered together, while the node pairs in the negative sample are scattered far away. Let us first consider the case of a weightless network. Use $y_i$ and $y_j$ to represent two points in a low-dimensional space. The probability that the two points have a binary edge $e_i_j=1$ (the edge with weight 1) in the kNN graph is:
+
+\begin{equation*}
+    P(e_i_j = 1) = f( {\mid \mid y_i - y_j \mid \mid} ^ 2)
+\end{equation*}
+
+\noindent Among them, f(⋅) similarly uses th e$t$ distribution in t-SNE, $f(x)= \frac{1}{1+x^2}$, if the distance between $y_i$ and $y_j$ is smaller, the probability of two points having a binary edge in the kNN graph is higher On the contrary, if the distance between $y_i$ and $y_j$ is larger, the probability that two points have binary edges in the kNN graph is smaller. LargeVis also considers the weighted network, and defines the probability that the edge weight is $w_i_j$ as:
+
+\begin{equation*}
+    P(e_i_j = w_i_j) = P(e_i_j = 1) ^ {w_i_j}
+\end{equation*}
+
+\noindent If we assume that the set of positive samples is $E$, and the set of negative samples is $\bar E$. Both the set of positive samples and negative samples can be obtained directly through the kNN graph. The optimization goal can be written as:
+
+\begin{equation*}
+    O = \prod_{(i,j)∈E} P(e_i_j = 1) ^ {w_i_j} \prod_{(i,j)∈\bar E} (1 - P(e_i_j = 1) ^ {\gamma}) 
+\end{equation*}
+
+\noindent The optimization goal is to maximize the probability that a positive sample node pair has a connected edge in the kNN graph, and minimize the probability that a negative sample node pair has a connected edge in the kNN graph, where γ is our unified negative sample edge The set weight. Here is another logarithm, the optimization goal becomes:
+
+\begin{equation*}
+    O =  \sum_{(i,j)∈E}  w_i_j(p(e_i_j = 1)) \sum_{(i,j)∈\bar E} \gamma (1 - P(e_i_j = 1))
+\end{equation*}
+
+\noindent Here we are using all negative samples $\bar E$, the calculation is too large. With the help of negative sampling algorithm, for each point $i$, we randomly select $M$ points and $i$ to form a negative sample following a noise distribution $P_n(j)$ with $P_n(j)∝d_j^{0. 75}$, where $d_j$ is the degree of point $j$ (here, the degree of the node is used, and word2vec is the word frequency of the word). We can redefine the objective function:
+
+\begin{equation*}
+    O =  \sum_{(i,j)∈E}  w_i_j(p(e_i_j = 1)  +\sum^k_{\substack{k=1\\ {E_{i_k} \sim P_n(j)}}} \gamma log (1 - P(e_{ij_{k}}) = 1))
+\end{equation*}
 
 \chapter{Umap}
 
