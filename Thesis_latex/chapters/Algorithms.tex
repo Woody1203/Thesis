@@ -373,10 +373,15 @@ higher values tend to lower and the lower values do the opposite in order to avo
     O =  \sum_{(i,j)∈E}  w_i_j(p(e_i_j = 1)  +\sum^k_{\substack{k=1\\ {E_{i_k} \sim P_n(j)}}} \gamma log (1 - P(e_{ij_{k}}) = 1))
 \end{equation*}
 
-\chapter{Umap}
+\noindent The objective function is very similar to the one for the Skip-gram model using the negative sampling technique. After the gradient is obtained, the edge weight $w_i_j$ still appears as a product of the product, which brings about a problem. The edge weight $w_i_j$ in the network varies widely. Therefore, affected by $w_i_j$, the gradient changes Will be relatively large, there will be the so-called gradient explosion and vanishing problem. After that, the edge sampling technique in LINE as discussed above is used. In fact, the principle is the same as negative sampling, but it is used in positive samples. If the weight of the edge between two points in the positive sample is $w_i_j$, we can convert it to $w_i_j$ overlapping binary edges.\\
 
+\noindent If there are multiple large weighted edges (hundreds or even thousands), after converting to binary edges, the total number of edges is also very large, and all considerations will also affect efficiency. Therefore, after all weighted edges are converted into binary edges (equivalent to equidistant division), random sampling is performed from these binary edges (equivalent to weighted sampling). The advantages of the edge sampling algorithm are: on the one hand, because the sampled edges are binary edges, the weights are the same, which solves the problem of a large gradient range; on the other hand, the sampling process essentially follows the weighted sampling strategy , Because the edges with larger weights have more binary edges converted, the greater the probability of being sampled, which ensures correctness and rationality.\\
 
-testtesttest\\
+\noindent After using negative sampling and edge sampling optimization, LargeVis also uses asynchronous stochastic gradient descent for training. This technique is very effective on sparse graphs because the two nodes connected by edges sampled by different threads are rarely duplicated , There is almost no conflict between different threads. In terms of time complexity, the time complexity of each round of random gradient descent is $O(sM)$, where $M$ is the number of negative samples, $s$ is the dimension of the low-dimensional space (2 or 3), and the number of steps of the random gradient It is usually proportional to the number of nodes N, so the total time complexity is $O(sMN)$. From this we can know that the time complexity of LargeVis is linear with the number of nodes in the network.
+
+\chapter{Uniform Manifold Approximation and Projection(Umap)}
+
+UMAP is another technique for dimensionality reduction using manifold learning after t-sne. It comes from the theoretical framework of Riemannian geometry and algebraic topology. UMAP is equivalent to t-SNE in terms of visual quality. While ensuring scalability, it retains more of the global spatial structure and performs well during runtime. At the same time, UMAP has no restrictions on the size of embeddings, and can be used as a general-purpose dimensionality reduction technology for machine learning.\\
 
 \chapter{Assessment Algorithm}
 
