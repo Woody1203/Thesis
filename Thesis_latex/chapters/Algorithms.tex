@@ -381,7 +381,88 @@ higher values tend to lower and the lower values do the opposite in order to avo
 
 \chapter{Uniform Manifold Approximation and Projection(Umap)}
 
-UMAP is another technique for dimensionality reduction using manifold learning after t-sne. It comes from the theoretical framework of Riemannian geometry and algebraic topology. UMAP is equivalent to t-SNE in terms of visual quality. While ensuring scalability, it retains more of the global spatial structure and performs well during runtime. At the same time, UMAP has no restrictions on the size of embeddings, and can be used as a general-purpose dimensionality reduction technology for machine learning.\\
+UMAP is another technique for dimensionality reduction using manifold learning after t-sne. It comes from the theoretical framework of Riemannian geometry and algebraic topology. While ensuring scalability, it retains more of the global spatial structure and performs well during runtime. At the same time, UMAP has no restrictions on the size of embeddings, and can be used as a general-purpose dimensionality reduction technology for machine learning. \\
+
+\noindent This algorithm is very similar to t-SNE and largevis algorithms. Each uses a graph layout algorithm to divide the data in a low-dimensional space. In short, the high-dimensional graph representation of UMAP structure data, and then the low-dimensional graph is optimized to be appropriately similar in structure. There are some differences from t-sne, leading to differences in the performance:\\
+
+\section{Exponential probability distribution in high dimensions}
+
+UMAP uses a high-dimensional exponential probability distribution, but does not necessarily use Euclidean distance like tSNE, but can insert any distance. In addition, it is different from the results obtained by t-SNE and LargeVis. Probabilities are not normalized:
+
+\begin{equation*}
+    {p_{j\mid i}} = \exp {[−(r_i_j− \rho_i)/\sigma_i]} 
+\end{equation*}
+
+\noindent Here $\rho_i$ is the distance to the nearest neighbor (the zero distance repeated by neighbors is not considered). An important parameter representing the distance from each $i-th$ data point to its first nearest neighbor. This ensures local connectivity of the manifold. In other words, this provides a locally adaptive exponential kernel for each data point, so the distance metric varies from point to point. \\
+
+\section{Symmetrization of high-dimensional probability}
+
+UMAP also uses a different symmetrization of high-dimensional probability:
+
+\begin{equation*}
+    {p_i_j} = p_{i\mid j} + p_{j\mid i} - p_{i\mid j}p_{j\mid i}
+\end{equation*}
+
+\noindent As in the t-sne algorithm, symmetrization is necessary, because after UMAP glues points with locally varying metrics together (through the parameter ρ), it may happen that the weights between nodes A and B are not equal to The case of the weight between B and A nodes.
+
+\section{Probabilities in low dimensions}
+
+\noindent  UMAP uses the curve family $1/(1+ a * y ^{2b})$ to model the low-dimensional distance probability. It is not exactly the student t distribution, but very similar:
+
+\begin{equation*}
+    {q_i_j} = (1 + a(y_i - y_j)^{2b} )^{-1}
+\end{equation*}
+
+\noindent Where $a$ = 1.93 and $b$ = 0.79 is the default value of the parameter(for $min\_dist$ = 0.01). UMAP finds $a$ and $b$ from non-linear least-square fitting to the piecewise function with the $min\_dist$ hyperparameter.\\
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[width=12cm,height=7cm\textwidth]{images/image_umap_LD Probability of Pairwise Euclidean Distances.png}
+\caption{edge sampling example}
+\label{fig:label}
+\end{figure}\\
+
+\noindent The diagram 4.1 below shows how $a$ and $b$ changes the curve. From the graph, we can easily find that $a$ changes the smoothness of the slope, $b$ drastically changes the shape of the function, and after forming a smooth peak at the beginning of Y, it drops drastically. Which means when b is high, all data points are equally tightly connected in the beginning. That is, in the low-dimensional space, all the data points are similar in closeness and this may lead to the emergence of close clustering.UMAP uses the $min\_dist$ hyperparameter to find $a$ and $b$ from the nonlinear least squares fitting to the piecewise function:\\
+
+\begin{equation*}
+    {q_i_j} = (1 + a(y_i - y_j)^{2b} )^{-1} = \left\{
+             \begin{array}{lr}
+             1 &  y_i - y_j \leq min\_dist\\
+             e^{-(y_i - y_j)-min\_dist}, & y_i - y_j \textgreater min\_dist 
+             \end{array}
+\right.
+\end{equation*}
+
+\noindent The algorithm does not apply normalization to high-dimensional and low-dimensional probabilities. As a result, the algorithm greatly reduces the time for calculating high-dimensional graphs, because summation or integration is a computationally expensive process.\\
+
+\section{Binary cross-entropy cost function}
+
+UMAP cost function is the cross entropy of two fuzzy sets, which can be expressed as a symmetric weight matrix:
+
+\begin{equation*}
+    C_{EUMAP}(X,Y) = \sum_{i} \sum _{j}[p_i_j \log(\frac{p_i_j(X)}{q_i_j(Y)}) + (1-p_i_j(X))\log (\frac{1-p_i_j(X)}{q_i_j(Y)})]
+\end{equation*}
+
+\noindent Then we can add the additional term in the $C_{EUMAP}$ cost function makes UMAP capable of capturing the global data structure:
+
+\begin{equation*}
+    C_{EUMAP}(X,d_i_j) = \sum _{j}[-P(X) \log Q(d_i_j) + (1 - P(X)) \log (1-Q(d_i_j))]
+\end{equation*}
+
+with \begin{equation*}
+    Q(d_i_j) = \frac{1}{1+ad_i_j^{2b}}  \qquad and \qquad   \frac{\partial Q}{\partial d_i_j} = -\frac{2abd_i_j^{2b-1}}{(1+ad_i_j^{2b})^2}
+\end{equation*}
+
+\noindent Also gradient of the cross-entropy is needed in order to calculate the Gradient Descent:
+
+\begin{equation*}
+\begin{aligned}
+\frac{\partial C_{EUMAP}}{\partial y_i}  &= \sum_j\left[- \frac{P(X)}{Q(d_i_j)} \frac{\partial Q}{\partial d_i_j} + \frac{1-P(x)}{1-Q(d_i_j)} \frac{\partial Q}{\partial d_i_j}\right]\\
+&= \sum_j \left[ \left( -P(X)(1+ad_{ij}^{2b}) + \frac{(1-P(X))(1 + ad_{ij}^{2b})}{ad_{ij}^{2b}} \right) \frac{\partial Q}{\partial d_i_j}\right]\\
+&= \sum_j \left[ \frac{2abd_{ij}^{2(b-1)}P(X)}{1 + ad_{ij}^{2b}} - \frac{2b(1-P(X))}{d_i_j^2(1+ad_i_j^{2b})} \right](y_i - y_j)
+\end{aligned}
+\end{equation*}
 
 \chapter{Assessment Algorithm}
 
