@@ -462,9 +462,20 @@ with \begin{equation*}
 &= \sum_j \left[ \left( -P(X)(1+ad_{ij}^{2b}) + \frac{(1-P(X))(1 + ad_{ij}^{2b})}{ad_{ij}^{2b}} \right) \frac{\partial Q}{\partial d_i_j}\right]\\
 &= \sum_j \left[ \frac{2abd_{ij}^{2(b-1)}P(X)}{1 + ad_{ij}^{2b}} - \frac{2b(1-P(X))}{d_i_j^2(1+ad_i_j^{2b})} \right](y_i - y_j)
 \end{aligned}
-\end{equation*}
+\end{equation*}\\
+
+\noindent In contrast to the random normal initialization used by tSNE, UMAP uses the Tulaplacian operator to assign initial low-dimensional coordinates. However, this should not have much impact on the final low-dimensional representation, at least for tSNE. However, this will reduce UMAP changes between each run because it is no longer randomly initialized. The choice of initialization by Graph Laplacian is to minimize KL divergence with early exaggeration in the initial stage of tSNE is equivalent to constructing Graph Laplacian.\\
+
+\noindent The graph Laplacian actually refers to an interesting method that combines matrix factorization and neighbor graph methods to solve the dimensionality reduction problem. In this method, we first construct a knn-graph, then form the Laplacian matrix with matrix algebra, and finally decompose the Laplacian matrix to solve the eigenvalue decomposition problem.\\
 
 \chapter{Assessment Algorithm}
 
+Similarity-based methods using Stochastic Neighbor Embedding such as t-SNE and its variants Umap and Largevis emerged with remarkable DR performances and also the time complexity. This part focus on analyzing its DR quality. \\
 
-testtesttest\\
+\noindent There are some studies developed DR quality criteria measuring the HD neighborhoods preservation in the LDS \cite{ref10}, which becomes generally adopted. This work examines the DR quality of these algorithm on numerous real-world and artificial data sets\cite{ref8}, using various potential parameter values for each one, given by neighborhood-based DR performance criteria \cite{ref9}. The area under the DR mensurement curve could be expressed as:
+
+\begin{equation*}
+    AUC  = \frac{ \sum_{K=1}^{N-2} R_{NX}(K)}{K\sum_{K=1}^{N-2}K^{-1}}   \in [-1,1]
+\end{equation*}
+
+\noindent Where $v^K_i$ and $n^K_i$ index the K nearest neighbors of high dimension data point $x_i$ and $y_i$ in the HD and LDS, with $Q_{NX} (K) = \sum_{i \in I} \mid v^K_i \cap n^K_i \mid / (KN) \in [0, 1] $measuring their average normalized agreement\cite{ref8}. Its expectation for random LD points becomes $K/ (N − 1)$. With $R_{NX} (K) = ((N − 1)Q_{NX} (K) − K) /(N − 1 − K)$ for comparing different neighbour sizes \cite{ref11}, the curve of the DR quality could be displayed with a log-scale for K as closer neighbors. \\ 
