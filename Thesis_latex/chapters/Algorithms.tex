@@ -472,10 +472,10 @@ with \begin{equation*}
 
 Similarity-based methods using Stochastic Neighbor Embedding such as t-SNE and its variants Umap and Largevis emerged with remarkable DR performances and also the time complexity. This part focus on analyzing its DR quality. \\
 
-\noindent There are some studies developed DR quality criteria measuring the HD neighborhoods preservation in the LDS \cite{ref10}, which becomes generally adopted. This work examines the DR quality of these algorithm on numerous real-world and artificial data sets\cite{ref8}, using various potential parameter values for each one, given by neighborhood-based DR performance criteria \cite{ref9}. The area under the DR mensurement curve could be expressed as:
+\noindent There are some studies developed DR quality criteria measuring the HD neighborhoods preservation in the LDS \cite{ref10}, which becomes generally adopted. This work examines the DR quality of these algorithm on numerous real-world and artificial data sets\cite{ref8}, using various potential parameter values for each one, given by neighborhood-based DR performance criteria \cite{ref9}. The area under the DR quality measurement curve could be expressed as:
 
 \begin{equation*}
-    AUC  = \frac{ \sum_{K=1}^{N-2} R_{NX}(K)}{K\sum_{K=1}^{N-2}K^{-1}}   \in [-1,1]
+    AUC  = \frac{ \sum_{K=1}^{N-2} R_{NX}(K)/K}{\sum_{K=1}^{N-2}K^{-1}}   \in [-1,1]
 \end{equation*}
 
 \noindent Where $v^K_i$ and $n^K_i$ index the K nearest neighbors of high dimension data point $x_i$ and $y_i$ in the HD and LDS, with $Q_{NX} (K) = \sum_{i \in I} \mid v^K_i \cap n^K_i \mid / (KN) \in [0, 1] $measuring their average normalized agreement\cite{ref8}. Its expectation for random LD points becomes $K/ (N − 1)$. With $R_{NX} (K) = ((N − 1)Q_{NX} (K) − K) /(N − 1 − K)$ for comparing different neighbour sizes \cite{ref11}, the curve of the DR quality could be displayed with a log-scale for K as closer neighbors. \\ 

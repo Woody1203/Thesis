@@ -2,4 +2,38 @@
 
 \chapter{comparisons and implementations}
 
-testtesttest\\
+\section{t-SNE}
+There are 4 most important parameters for t-SNE, the basic ideas of each parameters are: 
+
+\begin{enumerate}[1)]
+\item $perplexity$: number of nearest neighbors for each point
+\item $n\_iter$: maximum number of iterations for optimization
+\item $early\_exaggeration$: the tightness inside clusters and the distance inbetween
+\item $min\_grad\_norm$: the threshold for stopping the optimization 
+\end{enumerate}
+\\
+
+\noindent When we are analyzing the result, we should consider that the high-dimensional sphere was modeled by probability graph, the t-SNE algorithm adapts its "distance" concept to changes in regional density in the data set. As a result, it naturally expands dense clusters and shrinks sparse clusters, making the clusters roughly uniform in size. It also makes it difficult to see the relative size of clusters in the t-SNE graph, and the distance between clusters in low dimensions does not represent the distance between clusters in high dimensions.\\
+
+\subsection{$perplexity$}
+
+\noindent The first adjustable parameter of t-SNE represent the number of neighbors each point t-SNE considers. It explains how to maintain a balance between the local and global aspects of the data. The perplexity value has a complex effect on the generated pictures, but the performance of SNE is quite reliable for changes in complexity, and the typical value is between 5 and 50\cite{ref9}. Also, since the perplexity means the number of the neighbors, it should not be higher than the number of data points.\\
+
+\noindent We can try different potential perplexity values in datasets with different instances. At the same time, since the algorithm using stochastic method, the parameter $random\_state$ is set to 1. This parameter determines the random number generator so that it pass an int mark for reproducible results across multiple function calls. we get the figures below:\\
+\\
+\\
+% plt diff cluster result with diff perp for three dataset.
+
+As we can seen from the graph:\\
+
+
+\noindent Taking into account the experimental results and the inspiration of the search about the optimal number of neighbor from K nearest neighbour algorithm\cite{ref12}, we can simply set perplexity to $n^{0.5}$, where n stand for number of instances.\\
+
+
+\subsection{$n\_iter$}
+
+$n\_iter$ is the maximum number of iterations for the algorithm. The graph observed above are all generated with 1000 iteration which is the default value of $n\_iter$. In principle, the higher $n\_iter$ gives the better result. However, it may be very time consuming when it comes to big dataset. In contrast, if $n\_iter$ is too small, the algorithm does not have enough iteration to generate the convincing clusters in LD. The most important thing is to reach a stable configuration. The figure shows how the result changes with $n\_iter$ grows.
+
+% 上图显示了在困惑度30下的五个不同的运行。前四个在稳定之前已停止。经过10、20、60和120步后，您可以看到带有簇的一维甚至点状图像的布局。如果您看到t-SNE图上有奇怪的“挤压”形状，则该过程可能停止得太早。不幸的是，没有固定数量的步骤可以产生稳定的结果。不同的数据集可能需要不同数量的迭代才能收敛。
+
+% 之后还有perp与n_iter之间的heatmap，解释一波
