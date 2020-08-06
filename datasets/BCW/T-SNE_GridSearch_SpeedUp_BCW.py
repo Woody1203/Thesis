@@ -844,7 +844,7 @@ def open_dataset(dataset):
 def make_heatmap(df, path, dataset_name, variable_target, variable1, variable2):
 
     # print(heatmap1_data.head())
-    heatmap_image = sns.heatmap(df, annot=True, cmap="YlGnBu")
+    heatmap_image = sns.heatmap(df, annot=True, cmap="YlGnBu", fmt ='.3')
     # cmap="YlGnBu"
     # plt.show()
 
@@ -867,9 +867,9 @@ def save_dfs_and_heatmaps(path, List_time, List_auc, variable_target1, variable_
     # Displaying the KNN gain
     #viz_qa(Ly=L_kg, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=Lleg_kg, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='KNN gain', xlabel='Neighborhood size $K$', ylabel='$G_{NN}(K)$')
 
-    path_auc = path +'_' + str(dataset_name) + str(algorithm) + '_time_results.csv'
-    path_time = path + '_'+ str(dataset_name) + str(algorithm) + '_auc_results.csv'
-    path_result = path + '_'+ str(dataset_name) + str(algorithm) + '_best_parameters.csv'
+    path_auc = path + str(dataset_name) + str(algorithm)  + '_time_results.csv'
+    path_time = path + str(dataset_name) + str(algorithm) + '_auc_results.csv'
+    path_result = path + str(dataset_name) + str(algorithm)  + '_best_parameters.csv'
 
     best_parameters[str(variable_target1)] = best_auc_score
 
@@ -1110,7 +1110,7 @@ if __name__ == '__main__':
     variable2 = 'min_grad_norm_value'
     variable3 = 'n_iter_value'
     variable4 = 'early_exaggeration_value'
-    dataset_name = 'Iris'
+    dataset_name = 'BCW'
     algorithm = 'T-SNE'
 
     Lmedw = [1.5, 1.0, 1.0]
@@ -1177,6 +1177,7 @@ if __name__ == '__main__':
 
                     elapsed_time = time.time() - start_time
                     print("**************Finished in : " + str(elapsed_time) + " seconds****************")
+
                     print("Computing the DR quality of the result")
 
                     #####  test  #####
