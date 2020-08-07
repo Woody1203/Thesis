@@ -64,11 +64,13 @@ import numpy as np,pandas as pd, itertools, numba, sklearn.decomposition, scipy.
 from sklearn.manifold import TSNE
 import seaborn as sns
 from pandas import read_csv
+from numpy import savetxt
 import umap
 import time
 import LargeVis
 import argparse
-from sklearn.datasets import fetch_lfw_people
+from sklearn.datasets import fetch_olivetti_faces
+
 
 try:
     from collections import defaultdict, Mapping, namedtuple
@@ -823,13 +825,26 @@ def open_dataset_ccs():
     # print(dataset.head())
     return dataset
 
+def open_dataset(dataset):
+
+    labels =dataset['Concrete compressive strength(MPa, megapascals) ']
+    # dataset_glass = dataset.drop('id', 1)
+    dataset_glass = dataset.drop('Concrete compressive strength(MPa, megapascals) ', 1)
+
+    # 0724
+    # dataset = open_dataset_
+
+    X_hds = dataset_glass.to_numpy()
+    labels = labels.to_numpy()
+
+    return X_hds,labels
 
 ####  test
 
 def make_heatmap(df, path, dataset_name, variable_target, variable1, variable2):
 
     # print(heatmap1_data.head())
-    heatmap_image = sns.heatmap(df, annot=True, cmap="YlGnBu")
+    heatmap_image = sns.heatmap(df, annot=True, cmap="YlGnBu", fmt ='.3')
     # cmap="YlGnBu"
     # plt.show()
 
@@ -840,19 +855,60 @@ def make_heatmap(df, path, dataset_name, variable_target, variable1, variable2):
     figure.savefig(save_results_to +'_heatmap.png')
     figure.clf()
 
-def save_dfs_and_heatmaps():
-    pass
+def save_dfs_and_heatmaps(path, List_time, List_auc, variable_target1, variable_target2, variable1, variable2, variable3, variable4,  dataset_name, algorithm, best_auc_score, best_parameters):
+
+    df_time = pd.DataFrame (List_time, columns=[variable1, variable2, variable3, variable4, variable_target2])
+    df_auc = pd.DataFrame (List_auc, columns=[variable1, variable2, variable3, variable4, variable_target1])
+    #print(Lleg_kg)
+    # Displaying the DR quality criteria
+    #for i in L_rnx:
+        #print("values in L_rnx", i)
+    #viz_qa(Ly=L_rnx, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=Lleg_rnx, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='DR quality', xlabel='perplexity size $K$', ylabel='$R_{NX}(K)$')
+    # Displaying the KNN gain
+    #viz_qa(Ly=L_kg, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=Lleg_kg, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='KNN gain', xlabel='Neighborhood size $K$', ylabel='$G_{NN}(K)$')
+
+    path_auc = path + str(dataset_name) + str(algorithm)  + '_time_results.csv'
+    path_time = path + str(dataset_name) + str(algorithm) + '_auc_results.csv'
+    path_result = path + str(dataset_name) + str(algorithm)  + '_best_parameters.csv'
+
+    best_parameters[str(variable_target1)] = best_auc_score
+
+    # print(best_parameters)
+    # print("type of auc list after transform", type(test2))
+
+    with open(path_result, 'w') as f:
+        [f.write('{0}  {1}\n'.format(key, value)) for key, value in best_parameters.items()]
 
 
+    df_time.to_csv (path_auc, index = False, header=True)
+    df_auc.to_csv (path_time, index = False, header=True)
 
-# def open_dataset_LFW():
-#     # from sklearn.datasets import fetch_olivetti_faces
-#     # data = fetch_olivetti_faces(return_X_y=True)
-#
-#     from sklearn.datasets import load_iris
-#     X_hds = sklearn.datasets.load_iris([return_X_y=True])
-#
-#     return X_hds
+    mark = 0
+    iterable = [variable1, variable2, variable3, variable4]
+    output = itertools.combinations(iterable, 2)
+
+    for variable_temp1, variable_temp2 in output:
+        # print(variable1,"********", variable2)
+        for df in (df_auc, df_time):
+
+            # if variable1 == variable2:
+            #     continue
+
+            mark += 1
+
+            if (mark % 2) == 0:
+                # print("mark = ", mark)
+                variable_target_temp = 'elapsed_time'
+            else:
+                # print("mark = ", mark)
+                variable_target_temp = 'auc_value'
+
+            pivot_dataframe = pd.pivot_table(df, values=variable_target_temp,
+                                 index=variable_temp1,
+                                 columns=variable_temp2)
+
+            make_heatmap(pivot_dataframe, path, dataset_name, variable_target_temp, variable_temp1, variable_temp2)
+    return path_auc
 
 def viz_qa(path, name, Ly, ymin=None, ymax=None, Lmarkers=None, Lcols=None, Lleg=None, Lls=None, Lmedw=None, Lsdots=None, lw=2, markevery=0.1, tit='', xlabel='', ylabel='', alpha_plot=0.9, alpha_leg=0.8, stit=25, sax=20, sleg=15, zleg=1, loc_leg='best', ncol_leg=1, lMticks=10, lmticks=5, wMticks=2, wmticks=1, nyMticks=11, mymticks=4, grid=True, grid_ls='solid', grid_col='lightgrey', grid_alpha=0.7, xlog=True):
     """
@@ -985,74 +1041,34 @@ def viz_qa(path, name, Ly, ymin=None, ymax=None, Lmarkers=None, Lcols=None, Lleg
     save_results_to = path + str(name)
     plt.savefig(save_results_to + '_image.png')
 
-##############################
-##############################
-# Demo presenting how to use the main functions of this module.
-##############################
 
-##换dataset，与kaggle或者其他例子一样，验证labels的顺序是否与highDim data一一对应
 if __name__ == '__main__':
 
     print("========================================================================")
-    print("===== Starting the demo of LargeVis and of the DR quality criteria. =====")
+    print("====== Starting the demo of T-SNE and of the DR quality criteria. ======")
     print("========================================================================")
 
     start_start_time = time.time()
-############   UMAP test   #####################
     ## prepare the datasets
     print("Loading the test data set.")
     #### load ccs dataset  ###
 
-    dataset = open_dataset_ccs()
+    # dataset = open_dataset_ccs()
+    # X_hds, labels = open_dataset()
 
-    labels =dataset['Concrete compressive strength(MPa, megapascals) ']
-    # dataset_glass = dataset.drop('id', 1)
-    dataset_glass = dataset.drop('Concrete compressive strength(MPa, megapascals) ', 1)
+    data_iris = fetch_olivetti_faces()
+    X_hds = data_iris.data
+    labels = data_iris.target
+    # try:
+    #     rand_state = np.random.RandomState(0)
+    #     id_subs = rand_state.choice(a=X_hds.shape[0], size=700, replace=False)
+    #     X_hds, labels = X_hds[id_subs,:], labels[id_subs]
+    #     print("the size of dataset is:", X_hds.shape)
+    #     print("size after subsampling", X_hds.shape)
+    # except:
+#         print("the size of the dataset is less than 1000")
+    print("the size of dataset is:", X_hds.shape)
 
-    # 0724
-    # dataset = open_dataset_
-
-    X_hds = dataset_glass.to_numpy()
-    labels = labels.to_numpy()
-
-
-
-    # labels =dataset.target
-    # print(dataset.head())
-    # dataset.summary()
-    # dataset_glass = dataset.drop('target', 1)
-    # dataset_glass = dataset.drop('Speaker Number', 1)
-    # dataset_glass = dataset.drop('Sex', 1)
-    # dataset_glass = dataset.drop('class', 1)
-
-    # 0724
-    # dataset = open_dataset_
-
-    # X_hds = dataset_glass.to_numpy()
-    # labels = labels.to_numpy()
-
-    ### subsample
-    ## 0723_test
-    # Subsampling the data set, to accelerate the demo.
-
-    try:
-        print("the size of dataset", X_hds.shape)
-        rand_state = np.random.RandomState(0)
-        id_subs = rand_state.choice(a=X_hds.shape[0], size=700, replace=False)
-        X_hds, labels = X_hds[id_subs,:], labels[id_subs]
-        print("size after subsampling", X_hds.shape)
-    except:
-        print("the size of the dataset is less than 1000")
-        print("the size is:", X_hds.shape)
-
-
-    # print("shape of X_hds", X_hds.shape)
-    ## 0723_test
-
-    #### load glass dataset  ###
-    ## digit dataset
-    ## X_hds, labels = sklearn.datasets.load_digits(n_class=10, return_X_y=True)
-    # name of the txt form dataset created
     output_txt_file_name = "test_digit_HD.txt"
     #  Use the previously defined variable "output_txt_file_name" as the txt file name here
     np.savetxt(output_txt_file_name, X_hds, delimiter=" ", fmt='%i')
@@ -1061,12 +1077,6 @@ if __name__ == '__main__':
         out.write("{} {}\n".format(*X_hds.shape))
         for row in X_hds:
             out.write(' '.join(row.astype(str))+'\n')
-
-    ## load dataset
-    ##LargeVis.loadfile("C:/Users/15754/Desktop/LDATE2990 - Master Thesis/LargeVis/LargeVis_Github/LargeVis-master/Code/mnist_vec784D.txt")
-    #Y = LargeVis.run(args.outdim, args.threads, args.samples, args.prop, args.alpha, args.trees, args.neg, args.neigh, args.gamma, args.perp)
-    #print("******** size of the output **********",np.asarray(Y).shape)
-############   largevis test  #####################
 
     # Metric to compute the HD distances in cat-SNE.
     hd_metric = 'euclidean'
@@ -1078,7 +1088,7 @@ if __name__ == '__main__':
     init = 'ran'
     # number of threads
     threads_list = [1, 2, 4]
-    path = r'C:/Users/15754/Desktop/LDATE2990 - Master Thesis/Project/results/datasets/CCS/LargeVis/'
+    path = r'C:/Users/15754/Desktop/LDATE2990 - Master Thesis/Project/results/datasets/Oliv/umap/'
     # List of the theta thresholds to employ with cat-SNE.
     Ltheta = [0.7, 0.8, 0.9]
     #round = 1
@@ -1092,6 +1102,16 @@ if __name__ == '__main__':
     Lls = []
     List_time = []
     List_auc = []
+
+    variable_target1 = 'auc_value'
+    variable_target2 = 'elapsed_time'
+    variable1 = 'n_neighbors'
+    variable2 = 'min_dist'
+    variable3 = 'spread'
+    variable4 = 'negative_sample_rate'
+    dataset_name = 'Oliv'
+    algorithm = 'UMAP'
+
     Lmedw = [1.5, 1.0, 1.0]
     Lsdots = [14, 12, 12]
     #perplexity_gourp = [13,25,30]
@@ -1102,13 +1122,11 @@ if __name__ == '__main__':
     iterations = [1,2,3,4]
     iterations_1 = [1]
     #neg_group = [3,5,7]
+
     tot_largevis_perp_gourp = [15, 50, 70, 100,200]
     tot_largevis_neg_group = [3,5,10,20]
     tot_largevis_gamma_group = [7]
-    #tot_k_group = [[38,75,90],[105,120,135],[165,180,195],[210,225,263]]
     tot_largevis_neigh_group = [100, 150, 200]
-    # tot_k_group_default = [[50,50,50],[50,50,50]]
-    outermost_iterations = [1,2,3] # the most outside iteration
 
     tot_largevis_perp_gourp_test = [50]
     tot_largevis_neg_group_test = [5]
@@ -1120,50 +1138,21 @@ if __name__ == '__main__':
     tot_tsne_n_iter_group = [500, 700, 1000, 1200, 1500] # default = 1000
     tot_tsne_early_exaggeration_group = [10, 12, 15, 20, 30] # default = 12
 
-    # tot_tsne_perp_group_test = [30, 50]
-    # tot_tsne_min_grad_norm_group_test = [1e-07]
-    # tot_tsne_n_iter_group_test = [1000, 1500]
-    # tot_tsne_early_exaggeration_group_test = [12]
+    tot_tsne_perp_group_test = [30, 50]
+    tot_tsne_min_grad_norm_group_test = [1e-07]
+    tot_tsne_n_iter_group_test = [1000, 1500]
+    tot_tsne_early_exaggeration_group_test = [12]
 
-    tot_umap_n_neighbors_group = [2, 5, 10, 15, 30, 50, 100, 200]# default = 15
-    tot_umap_min_dist_group = [0.01, 0.1, 0.25, 0.5, 0.8, 0.99]# default = 0.1
-    tot_umap_spread_group = [0.1,0.5,1.0,3.0,5.0,10.0] # default = 1.0
-    tot_umap_negative_sample_rate_group = [3,5,10,30] # default = 5
+    tot_umap_n_neighbors_group = [5, 15, 50, 100, 200]# default = 15
+    tot_umap_min_dist_group = [0.01, 0.1, 0.5, 0.8, 0.99]# default = 0.1
+    tot_umap_spread_group = [0.1,1.0,3.0,5.0,10.0] # default = 1.0
+    tot_umap_negative_sample_rate_group = [3, 5, 10, 30, 50] # default = 5
 
-    # tot_umap_n_neighbors_group_test = [2]# default = 15
-    # tot_umap_min_dist_group_test = [0.0, 0.1]# default = 0.1
-    # tot_umap_spread_group_test = [0.1,0.5] # default = 1.0
-    # tot_umap_negative_sample_rate_group_test = [3]
+    tot_umap_n_neighbors_group_test = [15]# default = 15
+    tot_umap_min_dist_group_test = [ 0.1, 0.5]# default = 0.1
+    tot_umap_spread_group_test = [1.0,7.0] # default = 1.0
+    tot_umap_negative_sample_rate_group_test = [5] # default = 5
 
-    #
-
-    #print("Loading the test data set.")
-    ######   test    #######
-    #train_df = read_csv("C:/Users/15754/Desktop/code_master_thesis/dataset/heart.csv", index_col=0)
-    #train_df = train_df.fillna(0)
-    #X_hds = train_df.values## np.array from now on
-    #y =train_df['target']
-    #labels = y.values## np.array from now on
-    #X_hds=np.delete(X_hds, -1, axis=1)
-
-    #X_hds, labels = sklearn.datasets.load_digits(n_class=10, return_X_y=True)
-
-    ####  before the changing, labels with mean value -0.811733 which means there are around 90% of instances with ablel -1
-    ##### replace all the -1 labels with 0 for better vasualization
-    #y = y.replace(-1, 0)
-
-
-    # delete unnecessary columns
-    #X_hds=np.delete(X_hds, 0, axis=1)
-    ## delete the last column of the dataset
-
-
-    ######   test    #######
-    # Subsampling the data set, to accelerate the demo.
-    #rand_state = np.random.RandomState(0)
-    #id_subs = rand_state.choice(a=X_hds.shape[0], size=1700, replace=False)
-    #X_hds, labels = X_hds[id_subs,:], labels[id_subs]
-    # Computing the pairwise HD distances for the quality assessment.
     d_hd = scipy.spatial.distance.squareform(X=scipy.spatial.distance.pdist(X=X_hds, metric=hd_metric), force='tomatrix')
 
 
@@ -1172,97 +1161,20 @@ if __name__ == '__main__':
 
         # for iteration in iterations:
     best_auc_score = 0.0
-    for perp_value in tot_largevis_perp_gourp:
-        for neg_value in tot_largevis_neg_group:
-            for gamma_value in tot_largevis_gamma_group:
-                for neigh_value in tot_largevis_neigh_group:
+    for n_neighbors_value in tot_umap_n_neighbors_group:
+        for min_dist_value in tot_umap_min_dist_group:
+            for spread_value in tot_umap_spread_group:
+                for negative_sample_rate_value in tot_umap_negative_sample_rate_group:
 
-                    temp_list1 = []
-                    temp_list2 = []
+                    if min_dist_value > spread_value:
+                        continue
 
-                    # 0722
-                    # give value for each parameter
-                    # round_mark = int(0)
-                    # # if iteration == 1:
-                    # #     tot_para_group = tot_perplexity_gourp
-                    # #     mark = "perplexity"
-                    # # elif iteration == 2:
-                    # #     tot_para_group = tot_neg_group
-                    # #     mark = "neg"
-                    # # elif iteration == 3:
-                    # #     tot_para_group = tot_gamma_group
-                    # #     mark = "gamma"
-                    # # else:
-                    # #     tot_para_group = tot_k_group
-                    # #     mark = "neigh"
-                    # for para_group in tot_para_group:
-                    #     round_mark += 1
-                    #     print("outermost_iteration",outermost_iteration)
-                    #     print("parameter_",mark)
-                    #     print("round_",round_mark)
-                        # For each theta
-                        # for para_value in para_group:
-
-                    #n_neighbors = 10
-                      ####
                     start_time = time.time()
                     #print("this is mark",mark)
 
-                    print("Applying LargeVis for value in variable] with perp = {perp}, neg = {neg}, gamma = {gamma}, neigh = {neigh}".format(perp = perp_value, neg = neg_value, gamma = gamma_value, neigh = neigh_value))
-                    #####  test  #####
-                    #X_test_lds, max_ti = catsne(X_hds=X_hds, labels=labels, theta=theta, init=init, dim_lds=dim_lds, nit_max=nit_max, rand_state=np.random.RandomState(0), hd_metric=hd_metric)
-                    #print("**************",labels.shape)
-                    #print(type(max_ti))
-                    #print(max_ti.shape)
-
-                    ##TSNE(n_components=2, perplexity=30.0, early_exaggeration=12.0, learning_rate=200.0, n_iter=1000, n_iter_without_progress=300, min_grad_norm=1e-07, metric=’euclidean’, init=’random’, verbose=0, random_state=None, method=’barnes_hut’, angle=0.5)
-                    #tsne = TSNE(n_components=2, random_state=0, perplexity= perplexity, learning_rate= learning_rate)
-                    #embedding = LargeVis.LargeVis(threads = threads)
-                    #X_lds = embedding.fit_transform(X_hds)
-
-                    LargeVis.loadfile(output_txt_file_name)
-                    # tsne = TSNE(n_components=2, random_state=1, perplexity= perp_value, min_grad_norm = min_grad_norm_value, n_iter = n_iter_value, early_exaggeration = early_exaggeration_value)
-                    # X_lds = tsne.fit_transform(X_hds)
-                    #samples = -1
-
-                    #args.perp = 20
-                    #args.neigh = neigh_size
-                    #print("***********neigh_size***********",args.neigh)
-
-                    #args.gamma = 7
-                    #args.neg = neg_value
-
-                    # 0722
-                    # iteration for all values
-                    # if iteration == 1:
-                    #     args.perp = para_value
-                    #     print("perplexity =", para_value)
-                    # elif iteration == 2:
-                    #     args.neg = para_value
-                    #     print("neg = ",para_value)
-                    # elif iteration == 3:
-                    #     args.gamma = para_value
-                    #     print("gamma =", para_value)
-                    # else:
-
-                    # args.perp = perp_value
-                    # # print("check perp =", perp_value)
-                    # args.neg = neg_value
-                    # # print("checkneg =", neg_value)
-                    # args.gamma = gamma_value
-                    # # print("check gamma =", gamma_value)
-                    # args.neigh = neigh_value
-                    # print("check neigh =", neigh_value)
-                        # print("neigh =", para_value)
-
-                    args.perp = perp_value
-                    args.neg = neg_value
-                    args.gamma = gamma_value
-                    args.neigh = neigh_value
-
-                    X_lds = LargeVis.run(2, args.threads, args.samples, args.prop, args.alpha, args.trees, args.neg, args.neigh, args.gamma, args.perp)
-
-
+                    print("Applying " + str(algorithm)+ " for value in variable with n_neighbors = {n_neighbors}, min_dist = {min_dist}, spread = {spread}, negative_sample_rate = {negative_sample_rate}".format(n_neighbors = n_neighbors_value, min_dist = min_dist_value, spread = spread_value, negative_sample_rate = negative_sample_rate_value))
+                    embedding = umap.UMAP(n_neighbors=n_neighbors_value, min_dist=min_dist_value, spread = spread_value, negative_sample_rate = negative_sample_rate_value, random_state = 1)
+                    X_lds = embedding.fit_transform(X_hds)
 
                     elapsed_time = time.time() - start_time
                     print("**************Finished in : " + str(elapsed_time) + " seconds****************")
@@ -1276,111 +1188,28 @@ if __name__ == '__main__':
                     # transform the dataset from list to array
                     X_lds = np.array(X_lds)
 
-
-                    # Displaying the LD embedding
-                    #viz_test(X=X_lds, lab=labels, tit='LargeVis ($neigh_size={neigh_size}$)'.format(neigh_size=neigh_size))
-
                     rnxk, auc_rnx = eval_dr_quality(d_hd=d_hd, d_ld=d_ld)
                     auc_value = int(round(auc_rnx*1000))/1000.0
                     print("AUC score", auc_value)
                     print("*")
-                    #print("Computing the KNN gain of the result of t-SNE with threshold perplexity = {perplexity}".format(perplexity=perplexity))
-                    #kg, auc_kg = knngain(d_hd=d_hd, d_ld=d_ld, labels=labels)
-                    # Updating the lists for viz_qa
+
                     L_rnx.append(rnxk)
-                    #L_kg.append(kg)
 
-                    # args.perp = perp_value
-                    # args.neg = neg_value
-                    # args.gamma = gamma_value
-                    # args.neigh = neigh_value
-
-                    Ltime.append("{running_time} with perp = {perp}, neg = {neg}, gamma = {gamma}, neigh = {neigh}".format(running_time = elapsed_time, perp = perp_value, neg = neg_value, gamma = gamma_value, neigh = neigh_value))
-                    Lleg_rnx.append("AUC_score {AUC_score} with perp = {perp}, neg = {neg}, gamma = {gamma}, neigh = {neigh}".format(AUC_score = auc_value, perp = perp_value, neg = neg_value, gamma = gamma_value, neigh = neigh_value))
-                    List_time.append([perp_value, neg_value, gamma_value, neigh_value, elapsed_time])
-                    List_auc.append([perp_value, neg_value, gamma_value, neigh_value, auc_value])
+                    Ltime.append("{running_time} with n_neighbors = {n_neighbors}, min_dist = {min_dist}, spread = {spread}, negative_sample_rate = {negative_sample_rate}".format(running_time = elapsed_time, n_neighbors = n_neighbors_value, min_dist = min_dist_value, spread = spread_value, negative_sample_rate = negative_sample_rate_value))
+                    Lleg_rnx.append("AUC_score {AUC_score} with n_neighbors = {n_neighbors}, min_dist = {min_dist}, spread = {spread}, negative_sample_rate = {negative_sample_rate}".format(AUC_score = auc_value, n_neighbors = n_neighbors_value, min_dist = min_dist_value, spread = spread_value, negative_sample_rate = negative_sample_rate_value))
+                    List_time.append([n_neighbors_value, min_dist_value, spread_value, negative_sample_rate_value, elapsed_time])
+                    List_auc.append([n_neighbors_value, min_dist_value, spread_value, negative_sample_rate_value, auc_value])
 
                     #Lleg_kg.append("{a} t-SNE ($n_neighbors= {n_neighbors}$)".format(a=int(round(auc_kg*1000))/1000.0, n_neighbors= n_neighbors))
                     Lls.append('solid')
 
                     if auc_value > best_auc_score:#找到表现最好的参数
                         best_auc_score = auc_value
-                        best_parameters = {'perp':perp_value,'neg':neg_value, 'gamma': gamma_value, 'neigh':neigh_value}
+                        best_parameters = {str(variable1) :n_neighbors_value, str(variable2):min_dist_value, str(variable3): spread_value, str(variable4):negative_sample_rate_value}
 
-
-                # 0722
-                # print the image and save the result value and images automically
-                # list_L_rnx = L_rnx[-3:]
-                # list_Lleg_rnx = Lleg_rnx[-3:]
-                # try:
-                #     name = str(mark) + '_iteration_' + str(iteration) + '_round_' + str(round_mark)
-                #     #print("name", name)
-                #     viz_qa(path=path, name=name, Ly=list_L_rnx, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=list_Lleg_rnx, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='DR quality', xlabel=str(mark) + '_size $K$', ylabel='$R_{NX}(K)$')
-                #
-                # except:
-                #     name = str(mark) + '_iteration_' + str(iteration) + '_time_' + str(start_time)
-                #     #print("name", name)
-                #     viz_qa(path=path, name=name, Ly=list_L_rnx, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=list_Lleg_rnx, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='DR quality', xlabel=str(mark) + '_size $K$', ylabel='$R_{NX}(K)$')
-
-            #viz_test(X=X_lds, lab=labels, tit='LargeVis ($perplexity={perplexity}$)'.format(perplexity=perplexity))
-        #print("Lleg_rnx",Lleg_rnx)
-        #print("Rtime", Ltime)
-    #print("L_rnx",L_rnx)
-    # print("final Lleg_rnx",Lleg_rnx)
-    # print("********************* ")
-    # print("final Rtime", Ltime)
-    # print("********************* ")
     print("Best score:{:.3f}".format(best_auc_score))
     print("Best parameters:{}".format(best_parameters))
     end_end_time = time.time() - start_start_time
     print("**************Finished in : " + str(end_end_time/3600.0) + " hours****************")
 
-    variable_target1 = 'auc_value'
-    variable_target2 = 'elapsed_time'
-    variable1 = 'perp'
-    variable2 = 'neg'
-    variable3 = 'gamma'
-    variable4 = 'neigh'
-    dataset_name = 'CCS'
-    algorithm = 'LargeVis'
-
-    save_dfs_and_heatmaps()
-
-    df_time = pd.DataFrame (List_time, columns=[variable1, variable2, variable3, variable4, variable_target2])
-    df_auc = pd.DataFrame (List_auc, columns=[variable1, variable2, variable3, variable4, variable_target1])
-    #print(Lleg_kg)
-    # Displaying the DR quality criteria
-    #for i in L_rnx:
-        #print("values in L_rnx", i)
-    #viz_qa(Ly=L_rnx, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=Lleg_rnx, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='DR quality', xlabel='perplexity size $K$', ylabel='$R_{NX}(K)$')
-    # Displaying the KNN gain
-    #viz_qa(Ly=L_kg, Lmarkers=Lmarkers, Lcols=Lcols, Lleg=Lleg_kg, Lls=Lls, Lmedw=Lmedw, Lsdots=Lsdots, tit='KNN gain', xlabel='Neighborhood size $K$', ylabel='$G_{NN}(K)$')
-
-    df_time.to_csv (path +'_'+ str(dataset_name) + str(algorithm) + '_time_results.csv', index = False, header=True)
-    df_auc.to_csv (path + str(dataset_name) + str(algorithm) + '_auc_results.csv', index = False, header=True)
-
-    mark = 0
-    iterable = [variable1, variable2, variable3, variable4]
-    output = itertools.combinations(iterable, 2)
-
-    for variable_temp1, variable_temp2 in output:
-        # print(variable1,"********", variable2)
-        for df in (df_auc, df_time):
-
-            # if variable1 == variable2:
-            #     continue
-
-            mark += 1
-
-            if (mark % 2) == 0:
-                # print("mark = ", mark)
-                variable_target_temp = 'elapsed_time'
-            else:
-                # print("mark = ", mark)
-                variable_target_temp = 'auc_value'
-
-            pivot_dataframe = pd.pivot_table(df, values=variable_target_temp,
-                                 index=variable_temp1,
-                                 columns=variable_temp2)
-
-            make_heatmap(pivot_dataframe, path, dataset_name, variable_target_temp, variable_temp1, variable_temp2)
+    save_dfs_and_heatmaps(path, List_time, List_auc, variable_target1, variable_target2, variable1, variable2, variable3, variable4,  dataset_name, algorithm, best_auc_score, best_parameters)
