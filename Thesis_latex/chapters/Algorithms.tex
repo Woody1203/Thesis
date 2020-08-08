@@ -1,6 +1,6 @@
 \part{Algorithms} \label{part:three algorithms}
 
-\chapter{T-distributed Stochastic Neighbor Embedding (T-SNE)}
+\chapter{T-distributed Stochastic Neighbor Embedding (t-SNE)}
 
 \section{Background}
 
@@ -107,7 +107,7 @@ As we can observe from the image above, the dimension reduction result is satisf
 
 \noindent It can be observed from the figure that as the dimension increases, most of the data points are clustered near the surface of the sphere, and the distance distribution from the point $x_i$ is extremely uneven. If this distance relationship is directly retained to a low dimension, there will be a crowding problem.
 
-\section{T-SNE}
+\section{t-SNE}
 Draw a random sample with a capacity of $N$ from the normal population. If the mean of the normal population is $μ$, the variance is $\sigma^2$. The mean of the random sample is $\bar{x}$, and the variance is $s^2=  \frac {1}{N−1} \sum ^N_{i=1} (x_i−\bar{x})^2$, and the random variable t can be expressed as:
 
 \begin{equation*}
@@ -138,7 +138,7 @@ BH t-SNE has some improvements comparing with t-SNE algorithm with the help of t
 
 \subsection{kNN graph for the similarity in HD space}
 
-\noindent In t-sne, the overall distance distribution relationship in the high-dimensional space is expressed in the following form:
+\noindent In t-SNE, the overall distance distribution relationship in the high-dimensional space is expressed in the following form:
 
 \begin{equation*}
     {v_{j\mid i}} = \exp {(-\beta_i r^2_{ij})} 
@@ -205,7 +205,7 @@ When understanding the physical meaning of t-SNE gradient, the gradient can be r
 \label{Fig.main}
 \end{figure}
 
-\noindent Since the result from these two algorithm have similar accuracy and Barnes-Hut T-SNE is much faster than another. This thesis will focus the performance and characteristics of it.
+\noindent Since the result from these two algorithm have similar accuracy and Barnes-Hut t-SNE is much faster than another. This thesis will focus the performance and characteristics of it.
 
 % 再补两个通过bh t-SNE 和 t-SNE 的效果图
 
@@ -213,13 +213,13 @@ When understanding the physical meaning of t-SNE gradient, the gradient can be r
 
 
 
-\noindent  Although T-SNE works well on small-scale data, there are still some disadvantages of T-SNE:\\
+\noindent  Although t-SNE works well on small-scale data, there are still some disadvantages of t-SNE:\\
 
-\noindent 1. The efficiency of t-SNE is significantly reduced when processing large-scale high-dimensional data (including BH T-SNE)\\
+\noindent 1. The efficiency of t-SNE is significantly reduced when processing large-scale high-dimensional data (including BH t-SNE)\\
 
-\noindent 2.The parameters of t-SNE are sensitive to different data sets, which means that even finding out the proper parameters setting for T-SNE in one data set with there is a good visualization effect. However, it cannot be applied to another data set, and it takes a lot of time to find new suitable parameters.\\
+\noindent 2.The parameters of t-SNE are sensitive to different data sets, which means that even finding out the proper parameters setting for t-SNE in one data set with there is a good visualization effect. However, it cannot be applied to another data set, and it takes a lot of time to find new suitable parameters.\\
 
-\noindent As can be seen from the name, the goal of LargeVis\cite{ref5} is the visualization of large-scale data sets, which takes a different approach comparing with T-SNE: it reuses many of the same definitions as t-SNE but makes sufficiently modified so that stochastic gradient descent can be used. The main improvement is the efficient algorithm for constructing kNN graphs, as well as the low-dimensional space probability calculation formula and objective function.
+\noindent As can be seen from the name, the goal of LargeVis\cite{ref5} is the visualization of large-scale data sets, which takes a different approach comparing with t-SNE: it reuses many of the same definitions as t-SNE but makes sufficiently modified so that stochastic gradient descent can be used. The main improvement is the efficient algorithm for constructing kNN graphs, as well as the low-dimensional space probability calculation formula and objective function.
 
 \section{Efficient kNN graph constructing algorithm}
 
@@ -324,10 +324,11 @@ higher values tend to lower and the lower values do the opposite in order to avo
 \begin{figure}[ht]
 
 \centering
-\includegraphics[scale=0.85]{images/image_largevis_line_1.PNG}
+\includegraphics[width=12cm,height=7cm\textwidth]{images/image_largevis_line_1.PNG}
 \caption{edge sampling example}
 \label{fig:label}
 \end{figure}
+
 
 \noindent The first-order similarity between node 8 and node 9 in the graph is higher because the weight of the directly connected edges is higher. Node 1 and node 7 have most of the same neighbors, so the second-order similarity between the two is very high. The idea of edge sampling algorithm comes from the negative sampling optimization technique used by Mikolov in word2vec. It not only improves the efficiency of training, but also solves the problem of sharp increase in gradient caused by the weighted edge in the network representation during the training process.\\
 
@@ -381,9 +382,9 @@ higher values tend to lower and the lower values do the opposite in order to avo
 
 \chapter{Uniform Manifold Approximation and Projection(Umap)}
 
-UMAP is another technique for dimensionality reduction using manifold learning after t-sne. It comes from the theoretical framework of Riemannian geometry and algebraic topology. While ensuring scalability, it retains more of the global spatial structure and performs well during runtime. At the same time, UMAP has no restrictions on the size of embeddings, and can be used as a general-purpose dimensionality reduction technology for machine learning. \\
+UMAP is another technique for dimensionality reduction using manifold learning after t-SNE. It comes from the theoretical framework of Riemannian geometry and algebraic topology. While ensuring scalability, it retains more of the global spatial structure and performs well during runtime. At the same time, UMAP has no restrictions on the size of embeddings, and can be used as a general-purpose dimensionality reduction technology for machine learning. \\
 
-\noindent This algorithm is very similar to t-SNE and largevis algorithms. Each uses a graph layout algorithm to divide the data in a low-dimensional space. In short, the high-dimensional graph representation of UMAP structure data, and then the low-dimensional graph is optimized to be appropriately similar in structure. There are some differences from t-sne, leading to differences in the performance:\\
+\noindent This algorithm is very similar to t-SNE and largevis algorithms. Each uses a graph layout algorithm to divide the data in a low-dimensional space. In short, the high-dimensional graph representation of UMAP structure data, and then the low-dimensional graph is optimized to be appropriately similar in structure. There are some differences from t-SNE, leading to differences in the performance:\\
 
 \section{Exponential probability distribution in high dimensions}
 
@@ -403,7 +404,7 @@ UMAP also uses a different symmetrization of high-dimensional probability:
     {p_i_j} = p_{i\mid j} + p_{j\mid i} - p_{i\mid j}p_{j\mid i}
 \end{equation*}
 
-\noindent As in the t-sne algorithm, symmetrization is necessary, because after UMAP glues points with locally varying metrics together (through the parameter ρ), it may happen that the weights between nodes A and B are not equal to The case of the weight between B and A nodes.
+\noindent As in the t-SNE algorithm, symmetrization is necessary, because after UMAP glues points with locally varying metrics together (through the parameter ρ), it may happen that the weights between nodes A and B are not equal to The case of the weight between B and A nodes.
 
 \section{Probabilities in low dimensions}
 
