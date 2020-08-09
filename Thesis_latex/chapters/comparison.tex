@@ -125,7 +125,7 @@ This parameter is the threshold of gradient norm to determine when the optimizat
 
 \subsection{$early\_exaggeration$}
 
-$ early\ _exaggeration $ is a technique in which all $p_{ij}$ are multiplied and "exaggerated" in the early stages of optimization by multipling all $p_{ij}$s a fixed number in the initial stages of the optimization. This means that almost all of the $q_{ij}$ ’s, which still add up to 1, are much too small to model their corresponding $p_{ij}$ ’s. The result of this is to force the value of $q_ {ij}$ to be more concentrated on the larger $ p_{ij} $s, especially for closer points, thereby making the earlier clusters more tightly bound together This creates a lot of relatively empty space in the map, which makes it much easier for the clusters to move around relative to one another in order to find a good global organization\cite{ref13}. By doing that, it can control the closeness of clusters in high-dimensional space and the distance between them in low-dimensional space. For larger values, the space between natural clusters will be larger in the embedded space.
+$ early\_exaggeration $ is a technique in which all $p_{ij}$ are multiplied and "exaggerated" in the early stages of optimization by multipling all $p_{ij}$s a fixed number in the initial stages of the optimization. This means that almost all of the $q_{ij}$ ’s, which still add up to 1, are much too small to model their corresponding $p_{ij}$ ’s. The result of this is to force the value of $q_ {ij}$ to be more concentrated on the larger $ p_{ij} $s, especially for closer points, thereby making the earlier clusters more tightly bound together This creates a lot of relatively empty space in the map, which makes it much easier for the clusters to move around relative to one another in order to find a good global organization\cite{ref13}. By doing that, it can control the closeness of clusters in high-dimensional space and the distance between them in low-dimensional space. For larger values, the space between natural clusters will be larger in the embedded space.
 
 
 \subsection{Relations between parameters}
@@ -142,19 +142,20 @@ As in the previous theoretical analysis,  It is easy to find that running time i
 
 \begin{figure}[H]
 \centering  %图片全局居中
-% \subfigure[name1]
+% \subfigure[$min\_grad\_norm$ and $n\_iter$]
 {
 \label{Fig.sub.1}
 \includegraphics[width=4.5cm,height=4.5cm\textwidth]{images/t-sne/Digit_elapsed_time_min_grad_norm_value_n_iter_value_heatmap.png}}
-% \subfigure[name2]
+% \subfigure[$perplexity$ and $early\_exaggeration$]
 {
 \label{Fig.sub.2}
 \includegraphics[width=4.5cm,height=4.5cm\textwidth]{images/t-sne/Digit_elapsed_time_perp_value_early_exaggeration_value_heatmap.png}}
+% \subfigure[$perplexity$ and $n\_iter$]
 {
 \label{Fig.sub.3}
 \includegraphics[width=4.5cm,height=4.5cm\textwidth]{images/t-sne/Digit_elapsed_time_perp_value_n_iter_value_heatmap.png}}
 \centering
-\caption{Running time for perplexity and n\_iter with other parameters and with each other }
+\caption{Running time for perplexity and n\_iter on Digits dataset with other parameters set to default and with themselves }
 % \label{Fig.main}
 \end{figure}
 
@@ -162,15 +163,17 @@ As in the previous theoretical analysis,  It is easy to find that running time i
 There are 4 most important parameters for UMAP, the ideas of each parameters are:
 
 \begin{enumerate}[1)]
-\item $n_neighbors$: The size of local neighborhood like perplexity for t-SNE
+\item $n\_neighbors$: The size of local neighborhood like perplexity for t-SNE
+\item $min\_dist$: The effective minimum distance between embedded points
 \item $spread$: The effective scale of embedded points
-\item $min\_dist$: The effective minimum distance between embedded points.
 \item $negative\_sample\_rate$: Number of negative samples for per positive sample
 \end{enumerate}\\
 
 \subsection{$n\_neighbors$}
 
-The size of the local neighborhood used for manifold approximation. This parameter controls how UMAP balances local versus global structure in the data. It does this by constraining the size of the local neighborhood UMAP will look at when attempting to learn the manifold structure of the data. This means that low values of $n\_neighbors$ will force UMAP to concentrate on very local structure (potentially to the detriment of the big picture), while large values will push UMAP to look at larger neighborhoods of each point when estimating the manifold structure of the data, losing fine detail structure for the sake of getting the broader of the data. Also, since the $n\_neighbors$ means the number of the neighbors, it should not be higher than the number of data points.\\
+The size of the local neighborhood used for manifold approximation.  Its default value is 15 instead of 30 for $perplexity$ in t-SNE. This make sense since the definition of K is $k = 2^{\sum_i p_{ij}}$ where $p_{ij} = p_{i\mid j} + p_{j\mid i} - p_{i\mid j}p_{j\mid i}$ without the log 2 function in perplexity as $perplexity = 2^{-\sum_i p_{i \mid j} \log_2 p_{i \mid j} }$. \\
+
+\noindent The changes allows this parameter controls how UMAP balances local versus global structure in the data.It does this by constraining the size of the local neighborhood UMAP will look at when attempting to learn the manifold structure of the data. This means that low values of $n\_neighbors$ will force UMAP to concentrate on very local structure (potentially to the detriment of the big picture), while large values will push UMAP to look at larger neighborhoods of each point when estimating the manifold structure of the data, losing fine detail structure for the sake of getting the broader of the data. Also, since the $n\_neighbors$ means the number of the neighbors, it should not be higher than the number of data points.\\
 
 \noindent We can try different potential perplexity values in datasets with different instances.With the same time as t-SNE, in order to avoid the effect of stochastic for each round, the parameter $random_stateis$ set to 1. After examining it on the dataset Digits, we get the figures below:
 
@@ -202,9 +205,267 @@ The size of the local neighborhood used for manifold approximation. This paramet
 % \label{Fig.main}
 \end{figure}
 
-\noindent As we can observe from the figure, with the number of $n\_neighbors$ increases, when constructing graphical representations of high-dimensional data, UMAP connects more and more adjacent points, which leads to a projection that more accurately reflects the global structure of the data. When it is a very low value at 2, any idea of global structure has almost completely disappeared. \\
+\noindent These values of $n\_neighbors$ lead to AUC values for 0.391, 0.449, 0.437, 0.431 seperately. As we can observe from the figure, with the number of $n\_neighbors$ increases, when constructing graphical representations of high-dimensional data, UMAP connects more and more adjacent points, which leads to a projection that more accurately reflects the global structure of the data. When it is a very low value at 2, it focus on the local structure completely. \\
 
-\noindent Different from t-SNE algorithm, UMAP keep more 
+\subsection{$min\_dist$}
 
-% 8/Aug
-% 写完umap，开始测largevis的成对变量
+The $min_dist$ parameter controls how tightly UMAP is allowed to pack points together. It, quite literally, provides the minimum distance apart that points are allowed to be in the low dimensional representation. This means that low values of $min_dist$ will result in clumpier embeddings. Larger values of $min_dist$ will prevent UMAP from packing point together and will focus instead on the preservation of the broad topological structure instead.\\
+
+\noindent UMAP uses the family of curves $1 / (1+a*y^(2b))$ for modelling distance probabilities in low dimensions, not exactly Student t-distribution but very-very similar, without normalizatiom. As the formula mentioned in the theoretical part, the $min_dist$ determine the $a$ and $b$ for the curve directly:
+
+\begin{equation*}
+    {q_i_j} = (1 + a(y_i - y_j)^{2b} )^{-1} = \left\{
+             \begin{array}{lr}
+             1 &  y_i - y_j \leq min\_dist\\
+             e^{-(y_i - y_j)-min\_dist}, & y_i - y_j \textgreater min\_dist 
+             \end{array}
+\right.
+\end{equation*}
+
+\noindent Here below are figures with different $min\_dist$ with the Digit dataset as above:
+
+\begin{figure}[H]
+\centering  %图片全局居中
+% \subfigure[name1]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_min_dist_0.0.png}}
+% \subfigure[name2]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_min_dist_0.1.png}}
+\caption{LD result for UMAP with min\_dist 0.0 and 0.1}
+% \label{Fig.main}
+\end{figure}
+
+\begin{figure}[H]
+\centering  %图片全局居中
+% \subfigure[name1]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_min_dist_0.5.png}}
+% \subfigure[name2]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_min_dist_0.99.png}}
+\caption{LD result for UMAP with min\_dist 0.5 and 0.99}
+% \label{Fig.main}
+\end{figure}
+
+% 继续把min_dist搞完，之后时spread，参照网页先不考虑两者之间的关系。
+
+\noindent From the figures above, we see that using $min\_dist$=0.0, UMAP can find smaller connected components and clusters in the data, and emphasize these features in the final embedding. As these structures in $min\_dist$ increase, the size of the clusters also increase. These structures are pushed into softer and more general functions, which provide a better overall view of the data without the loss of more detailed topology. 
+
+\subsection{$spread$}
+
+$spread$ control the effective scale of embedded points, which means it determines the scale at which embedded points will be spread out. whereas increasing spread keeps the shape and boundary of the clusters a bit better. spread can therefore be used to control the inter-cluster distances to some extent, where as $min\_dist$ controls the size of the clusters.
+
+\subsection{$negative\_sample\_rate$}
+
+This parameter determine the number of negative samples to select per positive sample in the optimization process. Increasing this value will result in greater repulsive force being applied, greater optimization cost, but slightly more accuracy. Here below are figures for different $negative\_sample\_rate$ values:
+
+\begin{figure}[H]
+\centering  %图片全局居中
+% \subfigure[name1]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_neg_3.png}}
+% \subfigure[name2]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_neg_10.png}}
+\caption{LD result for UMAP with min\_dist 0.0 and 0.1}
+% \label{Fig.main}
+\end{figure}
+
+\begin{figure}[H]
+\centering  %图片全局居中
+% \subfigure[name1]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_neg_30.png}}
+% \subfigure[name2]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_neg_50.png}}
+\caption{LD result for UMAP with min\_dist 0.5 and 0.99}
+% \label{Fig.main}
+\end{figure}
+
+\noindent As we can observe, the clusters are more well identified with the increase of $negative\_sample\_rate$. As for the result, these four setting of the parameter has $AUC$ values 0.402, 0.425,  0.430, 0.449. At the same time, the running time (second) for each are 4.385, 7.749, 9.552,  25.615,  45.477 separately, which confirmed the previous argument.\\
+
+\subsection{Relationships between algorithms and parameters}
+
+\subsubsection{Running time}
+
+The most obvious finding is that UMAP use much less time than t-SNE to run the code in each dataset. Here below is the comparison between UMAP and t-SNE: 
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[width=12cm,height=7cm\textwidth]{images/image_time_umap_t-SNE.PNG}
+\caption{Time consumption on different dataset for 2 algorithms
+}
+\label{fig:label}
+\end{figure}\\
+
+There are several reasons for this:
+\begin{enumerate}[1)]
+
+\item As defined above, the High-dimensional and low-dimensional probability is expressed as $p_{i \mid j} = e^{-\frac{d(x_i,x_j) - \rho}{\sigma_i}}$ with $p_{ij} = p_{i\mid j} + p_{j\mid i} - p_{i\mid j}p_{j\mid i}$ and 
+${q_i_j} = (1 + a(y_i - y_j)^{2b} )^{-1}$, which do not apply normalization. Although they have been scaled for the segment [0,1], it turns out that there is no normalization, such as the denominator in the equation of $p_{i \mid j}$. The time for calculating high-dimensional graphs is greatly reduced, because summation or integration is a computationally expensive process. This method is like the Markov Chain Monte Carlo algorithm (MCMC). \\
+
+\item Different with the random normal initialization used by tSNE, UMAP uses the Tulaplace operator to assign initial low-dimensional coordinates. This will reduce the UMAP change from iteration to iteration because it is no longer random initialization.\\
+   
+\subsubsection{The global structure preserved better using UMAP}
+
+With a better global structure visualization result and better AUC acore, UMAP have a better balance betweeb local and global structure.\\
+
+This firstly because of different cost function using Cross-Entropy instead of the KL-divergence. As discussed above, we have:
+\begin{equation*}
+    C_{EUMAP}(X,d_i_j) = \sum _{j}[-P(X) \log Q(d_i_j) + (1 - P(X)) \log (1-Q(d_i_j))]
+\end{equation*}
+
+It can turn out to be:
+
+\begin{equation*}
+\begin{aligned}
+C_{EUMAP}(X,d_i_j)  &= \sum _{j}[-P(X) \log Q(d_i_j) + (1 - P(X)) \log (1-Q(d_i_j))]\\
+&= e^{-X^2} \log \left[ e^{-X^2} (1 + Y^2) \right] + (1 - e^{-X^2}) \log \left[ \frac{ (1 - e^{-X^2})(1 + Y^2)}{Y^2}\right]\\
+&\approx e^{-X^2} \log (1 + Y^2) + (1 - e^{-X^2}) \log (\frac{1 + Y^2}{Y^2})
+\end{aligned}
+\end{equation*}
+
+This leads to the change in the preservation balance of the local-global structure. At a smaller value of $X$, we obtain the same limit as t-SNE, because the second term disappears due to the previous factor, and the logarithmic function is slower than the polynomial function:
+
+\begin{equation*}
+\limits X \to 0 :{CE(X,Y) \approx \log (1 + Y^2)} 
+\end{equation*}
+
+Therefore, in order to minimize the loss, the Y coordinate is forced to be small, that is, $Y \to 0$. This is exactly the same behavior as t-SNE. However, in the opposite limit of large $X$, the first term disappears and the former factor of the second term becomes 1, we get:
+
+\begin{equation*}
+\limits X \to \infty :{CE(X,Y) \approx \log (\frac{1 + Y^2}{Y^2})} 
+\end{equation*}
+
+If $Y$ is small, we will get a high penalty due to Y in the logarithmic denominator, so we encourage Y to be large so that the ratio under the logarithm becomes 1, and we get zero penalty. Therefore, we get $Y\to\infty$ at $X\to\infty$, so when moving from high-dimensional space to low-dimensional space, the global distance is preserved.\\
+
+\subsubsection{Relationship between $perplexity$ and $n\_neighbor$}
+
+t-SNE and UMAP both define the high-dimensional probability at a certain distance for observing points as:
+
+\begin{equation*}
+p_{ij} \approx e^{-\frac{(x_i - x_j)^2}{2\sigma_i^2}}
+\end{equation*}
+
+Here $\sigma$ is the parameter for how many samples can be detected by each other, which is a finite value. This means the data points over the threshold of $\sigma$ will not be considered as a candidate to analyze. Because both tSNE and UMAP are neighbor graph algorithms, the local structure of the graph is retained. However, when $\sigma\to\infty$, every point has a chance to detect every other point, which means, in principle, both t-SNE and UMAP can retain the global structure. However, $\sigma$  is not the hyperparameter of tSNE and UMAP, but as a variable of $perplexity$ and $n\_neigbor$ respectively. Here below shows how the mean $\sigma$ infected by the $perplexity$ and $n\_neighbor$ hyperparameters:
+
+\begin{figure}[ht]
+
+\centering
+\includegraphics[width=12cm,height=7cm\textwidth]{images/image_sigmma.png}
+\caption{Behavior of mean $\sigma$ as a variable of $perplexity$ and $n\_neighbor$}
+\label{fig:label}
+\end{figure}\\
+
+We can easily observe that the $n\_neighbor$ hyperparameter is increased, the average sigma of UMAP will soon reach a plateau, while t-SNE is much more sensitive to $perplexity$. When it comes to big $perplexity$, the almost hyperbolic difference of the average $\sigma$ of t-SNE has a huge impact on the gradient of the tSNE cost function (KL difference). In the limit σ→∞, the high-dimensional probability in the above formula becomes 1, which leads to a decrease in the KL divergence gradient.
+
+\subsubsection{$n\_neighbors$ and $min\_dist$}
+
+From the previous derivation, we can basically draw the conclusion that $n\_neighbors$ change the balance between local and global structure and $min\_dist$ determine the size of the clusters. These two parameters affect the performance of the algorithm the most.\\
+
+The figures below shows the heatmap between $n\_neighbors$ and $min\_dist$ for each dataset, it is east to find that when $min\_dist$ goes middle of the range around 0.5 and $n\_neighbors$ goes also middle of the range around 50, the performance of UMAP is the best. Except on LFW dataset, where the better result comes from two parameters are set to almost minimum of the range. This may because the size of LFW is 10 to 100 times higher in both instances and dimensions comparing with the rest of the dataset. So the algorithm need to focus more on smaller scale of the structure and keep the size of the clusters relatively small in order to have a better dimension reduction result.  
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[Iris]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Iris_auc_value_n_neighbors_min_dist_heatmap.png}}
+\subfigure[Wine]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Wine_auc_value_n_neighbors_min_dist_heatmap.png}}
+% \caption{LD result for UMAP with n\_iter 2 and 15}
+% \label{Fig.main}
+\end{figure}
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[BCW]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/BCW_auc_value_n_neighbors_min_dist_heatmap.png}}
+\subfigure[Oliv]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Oliv_auc_value_n_neighbors_min_dist_heatmap.png}}
+% \caption{LD result for UMAP with n\_iter 50 and 200}
+% \label{Fig.main}
+\end{figure}
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[Digit]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_auc_value_n_neighbors_min_dist_heatmap.png}}
+\subfigure[LFW]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/LFW__auc_value_n_neighbors_min_dist_heatmap.png}}
+\caption{Heatmap result with different $n\_neighbors$ and $min\_dist$ in different dataset}
+% \label{Fig.main}
+\end{figure}
+
+\subsubsection{Parameters determine running time}
+
+As for the time consumption, $n\_neighbors$ and $negative\_sample\_rate$ are two most decisive parameters with the increasement of them. Due to space limitations, here will show the time consumption tendency in the heatmap form Digits, which is the representative dataset. 
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[$min\_dist$ and $negative\_sample\_rate$]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_min_dist_negative_sample_rate_heatmap.png}}
+\subfigure[$min\_dist$ and $spread$]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_min_dist_spread_heatmap.png}}
+% \caption{LD result for UMAP with n\_iter 2 and 15}
+% \label{Fig.main}
+\end{figure}
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[$n\_neighbors$ and $min\_dis$]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_n_neighbors_min_dist_heatmap.png}}
+\subfigure[$n\_neighbors$ and $negative\_sample\_rate$]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_n_neighbors_negative_sample_rate_heatmap.png}}
+% \caption{LD result for UMAP with n\_iter 50 and 200}
+% \label{Fig.main}
+\end{figure}
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[$n\_neighbors$ and $spread$]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_n_neighbors_spread_heatmap.png}}
+\subfigure[$spread$ and $negative\_sample\_rate$]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_spread_negative_sample_rate_heatmap.png}}
+\caption{Heatmap result with all the parameter pair in Digit dataset}
+% \label{Fig.main}
+\end{figure}
+
+It is clear that $n\_neighbors$ and $negative\_sample\_rate$  play a major role in the increase of running time. When it comes to heatmap for $n\_neighbors$ and $negative\_sample\_rate$, the highest running time comes when these two parameters set to highest.
+
+\end{enumerate}\\
+
+

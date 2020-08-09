@@ -424,7 +424,7 @@ UMAP also uses a different symmetrization of high-dimensional probability:
 \label{fig:label}
 \end{figure}\\
 
-\noindent The diagram 4.1 below shows how $a$ and $b$ changes the curve. From the graph, we can easily find that $a$ changes the smoothness of the slope, $b$ drastically changes the shape of the function, and after forming a smooth peak at the beginning of Y, it drops drastically. Which means when b is high, all data points are equally tightly connected in the beginning. That is, in the low-dimensional space, all the data points are similar in closeness and this may lead to the emergence of close clustering.UMAP uses the $min\_dist$ hyperparameter to find $a$ and $b$ from the nonlinear least squares fitting to the piecewise function:\\
+\noindent The diagram 4.1 below shows how $a$ and $b$ changes the curve. From the graph, we can easily find that $a$ changes the smoothness of the slope, $b$ drastically changes the shape of the function, and after forming a smooth peak at the beginning of Y, it drops drastically. Which means when b is high, all data points are equally tightly connected in the beginning. That is, in the low-dimensional space, all the data points are similar in closeness and this may lead to the emergence of close clustering. UMAP uses the $min\_dist$ hyperparameter to find $a$ and $b$ from the nonlinear least squares fitting to the piecewise function:\\
 
 \begin{equation*}
     {q_i_j} = (1 + a(y_i - y_j)^{2b} )^{-1} = \left\{
@@ -467,7 +467,7 @@ with \begin{equation*}
 
 \noindent In contrast to the random normal initialization used by tSNE, UMAP uses the Tulaplacian operator to assign initial low-dimensional coordinates. However, this should not have much impact on the final low-dimensional representation, at least for tSNE. However, this will reduce UMAP changes between each run because it is no longer randomly initialized. The choice of initialization by Graph Laplacian is to minimize KL divergence with early exaggeration in the initial stage of tSNE is equivalent to constructing Graph Laplacian.\\
 
-\noindent The graph Laplacian actually refers to an interesting method that combines matrix factorization and neighbor graph methods to solve the dimensionality reduction problem. In this method, we first construct a knn-graph, then form the Laplacian matrix with matrix algebra, and finally decompose the Laplacian matrix to solve the eigenvalue decomposition problem.\\
+\noindent The graph Laplacian actually combines matrix factorization and neighbor graph methods to solve the dimensionality reduction problem. In this method, we first construct a knn-graph, then form the Laplacian matrix with matrix algebra, and finally decompose the Laplacian matrix to solve the eigenvalue decomposition problem.\\
 
 \chapter{Assessment Algorithm}
 
