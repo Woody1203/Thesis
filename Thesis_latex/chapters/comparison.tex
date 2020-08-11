@@ -1,10 +1,10 @@
 \part{Comparison} \label{part:Comparison and implementation}
 
-\chapter{comparisons and implementations}
+\chapter{Comparisons and implementations}
 
 This chapter will analyze the characteristics of the three algorithms on different real-world data sets. Taking into account the differences between instances (N) and dimension (M), 6 data sets with different N and M will be tested. The code will test the AUC values of the algorithms, and first analyze the individual variables. Then, analyze the variables that affect each other according to the generated heatmap. Finally, this work will take 5 representative values from each variable of each algorithm, use grid search algorithm to find the parameters that each algorithm performs best on the same data set. Analyze the performance difference of $R_{NX}$ curve.\\
 
-\noindent As discussed above, in order to draw the conclusions in a convincing way, This work will examine the three algorithms' quality on several real-world data sets with different N and M, base on the neighborhood-based DR performance criteria discussed above. there are six public databases: Iris, Wine, Breast Cancer Wisconsin Diagnostic (BCW), Optical Recognition of Handwritten Digits test set (Digits), the Olivetti faces (Oliv) and Labeled Faces in the Wild face recognition(LFW).\\
+\noindent As discussed above, in order to draw the conclusions in a convincing way, This work will examine the three algorithms' quality on several real-world data sets with different N and M, base on the neighborhood-based DR performance criteria discussed above. there are six public databases: Iris, Wine, Breast Cancer Wisconsin Diagnostic (BCW), the Olivetti faces (Oliv), Optical Recognition of Handwritten Digits test set (Digits) and Labeled Faces in the Wild face recognition(LFW). The instance and dimension information of datasets are shown below:\\
 
 \begin{center}
 \begin{tabular}{|c|c|c|}% 通过添加 | 来表示是否需要绘制竖线
@@ -15,9 +15,9 @@ Iris & 150 & 4\\
 \hline  %在第一行和第二行之间绘制横线
 Wine & 178 & 13\\
 \hline  %在第一行和第二行之间绘制横线
-BCW & 569 & 30\\
-\hline  %在第一行和第二行之间绘制横线
 Oliv & 400 & 4096\\
+\hline  %在第一行和第二行之间绘制横线
+BCW & 569 & 30\\
 \hline  %在第一行和第二行之间绘制横线
 Digits & 1797 & 64\\
 \hline  %在第一行和第二行之间绘制横线
@@ -27,7 +27,7 @@ LFW & 13233 & 5749\\
 \end{center}
 \\
 
-\noindent When we are analyzing the result, we should consider that the high-dimensional sphere was modeled by probability graph, the t-SNE algorithm adapts its "distance" concept to changes in regional density in the data set. As a result, it naturally expands dense clusters and shrinks sparse clusters, making the clusters roughly uniform in size. It also makes it difficult to see the relative size of clusters in the t-SNE graph, and the distance between clusters in low dimensions does not represent the distance between clusters in high dimensions.
+\noindent When we are analyzing the result, we should consider that the high-dimensional sphere was modeled by probability graph, the three DR algorithms adapts its "distance" concept to changes in regional density in the data set. As a result, it naturally expands dense clusters and shrinks sparse clusters, making the clusters roughly uniform in size. It also makes it difficult to see the relative size of clusters in the result graph, and the distance between clusters in low dimensions does not represent directly the distance between clusters in high dimensions.
 
 \section{Grid search algorithm}
 
@@ -47,9 +47,9 @@ There are 4 most important parameters for t-SNE, the ideas of each parameters ar
 
 \subsection{$perplexity$}
 
-\noindent $perplexity$ represent the number of neighbors each point t-SNE considers. It explains how to maintain a balance between the local and global aspects of the data. The perplexity value has a complex effect on the generated pictures, but the performance of SNE is quite reliable for changes in complexity, and the typical value of perplexity is between 5 and 50\cite{ref9}. Also, since the perplexity means the number of the neighbors, it should not be higher than the number of data points.\\
+\noindent $perplexity$ represent the number of neighbors each point t-SNE considers. It explains how to maintain a balance between the local and global aspects of the data. The perplexity value has a complex effect on the generated pictures, but the performance of SNE is quite reliable for changes in complexity, and the typical value of perplexity is between 5 and 50\cite{ref9}. Also, since the perplexity means the number of the neighbors, it should not be higher than the total number of data points.\\
 
-\noindent We can try different potential perplexity values in datasets with different instances. At the same time, since the algorithm using stochastic method, the parameter $random\_state$ is set to 1. This parameter determines the random number generator so that it pass an int mark for reproducible results across multiple function calls. After examining it on the first dataset Iris, we get the figures below:
+\noindent We can try different potential perplexity values in datasets with different instances. At the same time, since the algorithm using stochastic method, the parameter $random\_state$ is set to 1. This parameter determines the random number generator so that it pass an int mark for reproducible results across multiple function calls. After examining it on the first dataset Iris, we get the figures below. For comparing visualization quality on the dataset, From this result, the experiment colored each node with the information of its label in the visualized low-dimensional graph:
 
 \begin{figure}[H]
 \centering  %图片全局居中
@@ -80,13 +80,9 @@ There are 4 most important parameters for t-SNE, the ideas of each parameters ar
 \end{figure}
 
 
-\noindent In the figure, we can see that when the value is in the range of 5-50, clusters are well distinguished. Considering that the number of instances of the dataset is only 150, when the value is 100, the clusters begin to merge. When the perplexity = 200, it is difficult to distinguish different clusters. In order for the algorithm to work properly, the perplexity should actually be less than the number of points. Considering the experimental results and the strategy of the search about the optimal number of neighbor from K nearest neighbour algorithm\cite{ref12}, we can simply set perplexity to $n^{0.5}$, where n stand for number of instances. \\
+\noindent In the figure, we can see that when the value is in the range of 5-50, clusters are well distinguished. Considering that the number of instances of the dataset is only 150, when the value is 100, the clusters begin to merge. When the perplexity = 200, it is difficult to distinguish different clusters. Considering the experimental results on each dataset and the strategy of the search about the optimal number of neighbor from K nearest neighbour algorithm\cite{ref12}, we can simply set perplexity to $n^{0.5}$, where n stand for number of instances. \\
 
-\noindent At the same time, the $AUC$ value for the result with these parameters are 0.731, 0.658, 0.654, -0.004 separately. These $AUC$ values verifies the previous observations. As for the last one, it has a big difference between others and also the only minus result. With the definition of the $R_{NX}$ curve $R_{NX} (K) = ((N − 1)Q_{NX} (K) − K) /(N − 1 − K)$, this is because the K is higher than N in the formula. Numerator is relative small and denominator is a negative number, we then have a minus result.
-
-\subsection{$min\_grad\_norm$}
-
-This parameter is the threshold of gradient norm to determine when the optimization will be stopped. If the norm is less than the setting value, the gradient descent of Kullback-Leiber divergence will stop.
+\noindent At the same time, the $AUC$ value for the result with these parameters are 0.731, 0.658, 0.654, -0.004 separately. These $AUC$ values verifies the previous observations. As for the last one, it has a big difference between others and also the only minus result. With the definition of the $R_{NX}$ curve $R_{NX} (K) = ((N − 1)Q_{NX} (K) − K) /(N − 1 − K)$. This is because the K is higher than N in the formula. The $Q_{NX}$ on the numerator is relative small since the normalization term is largest and denominator is a negative number, we then have a minus result.
 
 \subsection{$n\_iter$}
 
@@ -122,6 +118,9 @@ This parameter is the threshold of gradient norm to determine when the optimizat
 
 \noindent From the figure, we can easily observe that the more iterations, the more well identified for clusters. These four $n\_iter$ generate $AUC$ values for 0.489, 0.526, 0.533, 0.536 separately, which verified the previous conclusion.
 
+\subsection{$min\_grad\_norm$}
+
+This parameter is the threshold of gradient norm to determine when the optimization will be stopped. If the norm is less than the setting value, the gradient descent of Kullback-Leiber divergence will stop. Considering the default number of this parameter is small enough, after examining its potential values, the accuracy is promised if it is set to a relative small value. When it becomes too big, gradient descent may not even find out the local minimum.
 
 \subsection{$early\_exaggeration$}
 
@@ -130,15 +129,62 @@ $ early\_exaggeration $ is a technique in which all $p_{ij}$ are multiplied and 
 
 \subsection{Relations between parameters}
 
-The algorithm also generates a series of heatmaps to show the relationship of each parameter pair. The algorithm also generates a series of heatmaps to show the relationship of each parameter pair. Heatmap represents the effect of one parameter change on another parameter when other parameters take default values. According to the operation of t-SNE on 6 data sets, there are several interesting findings worth showing:
+The code of examination also generates a series of heatmaps to show the relationship of each parameter pair. The algorithm also generates a series of heatmaps to show the relationship of each parameter pair. Heatmap represents the effect of one parameter change on another parameter when other parameters take default values. According to the operation of t-SNE on 6 data sets, :
 
 \subsubsection{$early\_exaggeration$ and $n\_iter$:}
-\subsubsection{$early\_exaggeration$ and $perplexity$:}
-\subsubsection{$perplexity$ and $n\_iter$:}
+
+The figures below shows the heatmap between $early\_exaggeration$ and $n\_iter$ for each dataset:
+
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[Iris]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=4.5cm\textwidth]{images/t-SNE_conparison/Iris_auc_value_n_iter_value_early_exaggeration_value_heatmap.png}}
+\subfigure[Wine]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=4.5cm\textwidth]{images/t-SNE_conparison/Wine_auc_value_n_iter_value_early_exaggeration_value_heatmap.png}}
+% \label{Fig.main}
+% \end{figure}
+
+% \begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[Oliv]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=4.5cm\textwidth]{images/t-SNE_conparison/Oliv_auc_value_n_iter_value_early_exaggeration_value_heatmap.png}}
+\subfigure[BCW]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=4.5cm\textwidth]{images/t-SNE_conparison/BCW_auc_value_n_iter_value_early_exaggeration_value_heatmap.png}}
+% \label{Fig.main}
+% \end{figure}
+% \begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[Digits]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=4.5cm\textwidth]{images/t-SNE_conparison/Digit_auc_value_n_iter_value_early_exaggeration_value_heatmap.png}}
+\subfigure[LFW]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=4.5cm\textwidth]{images/t-SNE_conparison/LFW__auc_value_n_iter_value_early_exaggeration_value_heatmap.png}}
+
+\centering
+\caption{$early\_exaggeration$ and $n\_iter$ on different dataset}
+% \label{}
+\end{figure}
+
+\noindent It is easy to find that when $early\_exaggeration$ goes smaller and $n\_iter$ goes larger, the performance of t-SNE is the better. When these two parameters come to smallest and largest of the range separately, the AUC value is the best. Except on two small dataset (Iris and Wine), where the better result is almost as good as other values with the difference of AUC to other values less than 0.01. This make sense since larger $early\_exaggeration$ force clusters to move around relative to one another in order to find a good global structure. With the number of iteration increase, there are higher probability for algorithm to reach a stable configuration.
+
+% \subsubsection{$early\_exaggeration$ and $perplexity$:}
+% % \subsubsection{$perplexity$ and $n\_iter$:}
 
 \subsubsection{Running time:}
 
-As in the previous theoretical analysis,  It is easy to find that running time increase with $perplexity$ and $n\_iter$ affect the running time the most. The time increases significantly with these two variables independently with the same trend on 6 data sets. Take digits as an example, there are heatmaps for time:
+As in the previous theoretical analysis,  It is easy to find that running time increase with $perplexity$ and $n\_iter$ affect the running time the most. The time increases significantly with these two variables independently with the same trend on 6 data sets. Take digits dataset as an example, there are heatmaps for these two parameters with others:
 
 \begin{figure}[H]
 \centering  %图片全局居中
@@ -155,7 +201,7 @@ As in the previous theoretical analysis,  It is easy to find that running time i
 \label{Fig.sub.3}
 \includegraphics[width=4.5cm,height=4.5cm\textwidth]{images/t-sne/Digit_elapsed_time_perp_value_n_iter_value_heatmap.png}}
 \centering
-\caption{Running time for perplexity and n\_iter on Digits dataset with other parameters set to default and with themselves }
+\caption{Running time for perplexity and n\_iter on Digits dataset with other parameters set to default }
 % \label{Fig.main}
 \end{figure}
 
@@ -173,9 +219,9 @@ There are 4 most important parameters for UMAP, the ideas of each parameters are
 
 The size of the local neighborhood used for manifold approximation.  Its default value is 15 instead of 30 for $perplexity$ in t-SNE. This make sense since the definition of K is $k = 2^{\sum_i p_{ij}}$ where $p_{ij} = p_{i\mid j} + p_{j\mid i} - p_{i\mid j}p_{j\mid i}$ without the log 2 function in perplexity as $perplexity = 2^{-\sum_i p_{i \mid j} \log_2 p_{i \mid j} }$. \\
 
-\noindent The changes allows this parameter controls how UMAP balances local versus global structure in the data.It does this by constraining the size of the local neighborhood UMAP will look at when attempting to learn the manifold structure of the data. This means that low values of $n\_neighbors$ will force UMAP to concentrate on very local structure (potentially to the detriment of the big picture), while large values will push UMAP to look at larger neighborhoods of each point when estimating the manifold structure of the data, losing fine detail structure for the sake of getting the broader of the data. Also, since the $n\_neighbors$ means the number of the neighbors, it should not be higher than the number of data points.\\
+\noindent The changes allows this parameter controls how UMAP balances local versus global structure in the data.It does this by constraining the size of the local neighborhood UMAP will look at when attempting to learn the manifold structure of the data. This means that low values of $n\_neighbors$ will force UMAP to concentrate on very local structure, while large values will push UMAP to look at larger neighborhoods of each point when estimating the manifold structure of the data, losing fine detail structure for the sake of getting the broader of the data. Also, since the $n\_neighbors$ means the number of the neighbors, it should not be higher than the number of data points.\\
 
-\noindent We can try different potential perplexity values in datasets with different instances.With the same time as t-SNE, in order to avoid the effect of stochastic for each round, the parameter $random_stateis$ set to 1. After examining it on the dataset Digits, we get the figures below:
+\noindent We can try different potential perplexity values in datasets with different instances. Same as t-SNE, in order to avoid the effect of stochastic for each round, the parameter is $random_stateis$ set to 1. After examining it on the dataset Digits, we get the figures below:
 
 \begin{figure}[H]
 \centering  %图片全局居中
@@ -192,7 +238,6 @@ The size of the local neighborhood used for manifold approximation.  Its default
 \end{figure}
 
 \begin{figure}[H]
-\centering  %图片全局居中
 % \subfigure[name1]
 {
 \label{Fig.sub.1}
@@ -258,7 +303,7 @@ The $min_dist$ parameter controls how tightly UMAP is allowed to pack points tog
 
 \subsection{$spread$}
 
-$spread$ control the effective scale of embedded points, which means it determines the scale at which embedded points will be spread out. whereas increasing spread keeps the shape and boundary of the clusters a bit better. spread can therefore be used to control the inter-cluster distances to some extent, where as $min\_dist$ controls the size of the clusters.
+$spread$ control the effective scale of embedded points, which means it determines the scale at which embedded points will be spread out. Whereas increasing spread keeps the shape and boundary of the clusters a bit better. Spread can therefore be used to control the inter-cluster distances to some extent, where as $min\_dist$ controls the size of the clusters.
 
 \subsection{$negative\_sample\_rate$}
 
@@ -315,7 +360,7 @@ There are several reasons for this:
 \item As defined above, the High-dimensional and low-dimensional probability is expressed as $p_{i \mid j} = e^{-\frac{d(x_i,x_j) - \rho}{\sigma_i}}$ with $p_{ij} = p_{i\mid j} + p_{j\mid i} - p_{i\mid j}p_{j\mid i}$ and 
 ${q_i_j} = (1 + a(y_i - y_j)^{2b} )^{-1}$, which do not apply normalization. Although they have been scaled for the segment [0,1], it turns out that there is no normalization, such as the denominator in the equation of $p_{i \mid j}$. The time for calculating high-dimensional graphs is greatly reduced, because summation or integration is a computationally expensive process. This method is like the Markov Chain Monte Carlo algorithm (MCMC). \\
 
-\item Different with the random normal initialization used by tSNE, UMAP uses the Tulaplace operator to assign initial low-dimensional coordinates. This will reduce the UMAP change from iteration to iteration because it is no longer random initialization.\\
+\item Different with the random normal initialization used by tSNE, UMAP uses the graph laplacian method to assign initial low-dimensional coordinates. This will reduce the UMAP change from iteration to iteration because it is no longer random initialization.\\
    
 \subsubsection{The global structure preserved better using UMAP}
 
@@ -348,7 +393,7 @@ Therefore, in order to minimize the loss, the Y coordinate is forced to be small
 \limits X \to \infty :{CE(X,Y) \approx \log (\frac{1 + Y^2}{Y^2})} 
 \end{equation*}
 
-If $Y$ is small, we will get a high penalty due to Y in the logarithmic denominator, so we encourage Y to be large so that the ratio under the logarithm becomes 1, and we get zero penalty. Therefore, we get $Y\to\infty$ at $X\to\infty$, so when moving from high-dimensional space to low-dimensional space, the global distance is preserved.\\
+If $Y$ is small, we will get a high penalty due to $Y$ in the logarithmic denominator, so we encourage Y to be large so that the ratio under the logarithm becomes 1, and we get zero penalty. Therefore, we get $Y\to\infty$ at $X\to\infty$, so when moving from high-dimensional space to low-dimensional space, the global distance is preserved.\\
 
 \subsubsection{Relationship between $perplexity$ and $n\_neighbor$}
 
@@ -358,7 +403,7 @@ t-SNE and UMAP both define the high-dimensional probability at a certain distanc
 p_{ij} \approx e^{-\frac{(x_i - x_j)^2}{2\sigma_i^2}}
 \end{equation*}
 
-Here $\sigma$ is the parameter for how many samples can be detected by each other, which is a finite value. This means the data points over the threshold of $\sigma$ will not be considered as a candidate to analyze. Because both tSNE and UMAP are neighbor graph algorithms, the local structure of the graph is retained. However, when $\sigma\to\infty$, every point has a chance to detect every other point, which means, in principle, both t-SNE and UMAP can retain the global structure. However, $\sigma$  is not the hyperparameter of tSNE and UMAP, but as a variable of $perplexity$ and $n\_neigbor$ respectively. Here below shows how the mean $\sigma$ infected by the $perplexity$ and $n\_neighbor$ hyperparameters:
+Here $\sigma$ is the parameter for how many samples can be detected by each other, which is a finite value. This means the data points over the threshold of $\sigma$ will not be considered as a candidate to analyze. Because both tSNE and UMAP are neighbor graph algorithms, the local structure of the graph is retained. However, when $\sigma\to\infty$, every point has a chance to detect every other point, which means, in principle, both t-SNE and UMAP can retain the global structure. However, $\sigma$  is not the hyperparameter of tSNE and UMAP, but as a variable of $perplexity$ and $n\_neigbor$ respectively. Here the figure 6.14 shows how the mean $\sigma$ infected by the $perplexity$ and $n\_neighbor$ hyperparameters.\\
 
 \begin{figure}[ht]
 
@@ -368,13 +413,13 @@ Here $\sigma$ is the parameter for how many samples can be detected by each othe
 \label{fig:label}
 \end{figure}\\
 
-We can easily observe that the $n\_neighbor$ hyperparameter is increased, the average sigma of UMAP will soon reach a plateau, while t-SNE is much more sensitive to $perplexity$. When it comes to big $perplexity$, the almost hyperbolic difference of the average $\sigma$ of t-SNE has a huge impact on the gradient of the tSNE cost function (KL difference). In the limit σ→∞, the high-dimensional probability in the above formula becomes 1, which leads to a decrease in the KL divergence gradient.
+We can easily observe that the $n\_neighbor$ hyperparameter is increased, the average sigma of UMAP will soon reach a plateau, while t-SNE is much more sensitive to $perplexity$. When it comes to big $perplexity$, the almost hyperbolic difference of the average $\sigma$ of t-SNE has a huge impact on the gradient of the tSNE cost function (KL difference). In the limit σ→∞, the high-dimensional probability in the above formula becomes 1, which leads to a decrease in the KL divergence gradient.\\
 
-\subsubsection{$n\_neighbors$ and $min\_dist$}
+\subsubsection{Relationship between $n\_neighbors$ and $min\_dist$}
 
 From the previous derivation, we can basically draw the conclusion that $n\_neighbors$ change the balance between local and global structure and $min\_dist$ determine the size of the clusters. These two parameters affect the performance of the algorithm the most.\\
 
-The figures below shows the heatmap between $n\_neighbors$ and $min\_dist$ for each dataset, it is east to find that when $min\_dist$ goes middle of the range around 0.5 and $n\_neighbors$ goes also middle of the range around 50, the performance of UMAP is the best. Except on LFW dataset, where the better result comes from two parameters are set to almost minimum of the range. This may because the size of LFW is 10 to 100 times higher in both instances and dimensions comparing with the rest of the dataset. So the algorithm need to focus more on smaller scale of the structure and keep the size of the clusters relatively small in order to have a better dimension reduction result.  
+The figures below shows the heatmap between $n\_neighbors$ and $min\_dist$ for each dataset, it is easy to find that when $min\_dist$ goes middle of the range around 0.5 and $n\_neighbors$ goes also middle of the range around 50, the performance of UMAP is the best. Except on LFW dataset, where the better result comes from two parameters are set to almost minimum of the range. This may because the size of LFW is 10 to 100 times higher in both instances and dimensions comparing with the rest of the dataset. So the algorithm need to focus more on smaller scale of the structure and keep the size of the clusters relatively small in order to have a better dimension reduction result.  
 
 \begin{figure}[H]
 \centering  %图片全局居中
@@ -402,9 +447,9 @@ The figures below shows the heatmap between $n\_neighbors$ and $min\_dist$ for e
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Oliv_auc_value_n_neighbors_min_dist_heatmap.png}}
 % \caption{LD result for UMAP with n\_iter 50 and 200}
 % \label{Fig.main}
-\end{figure}
+% \end{figure}
 
-\begin{figure}[H]
+% \begin{figure}[H]
 \centering  %图片全局居中
 \subfigure[Digit]
 {
@@ -418,54 +463,228 @@ The figures below shows the heatmap between $n\_neighbors$ and $min\_dist$ for e
 % \label{Fig.main}
 \end{figure}
 
-\subsubsection{Parameters determine running time}
+\subsubsection{Influence of parameters on running time}
 
-As for the time consumption, $n\_neighbors$ and $negative\_sample\_rate$ are two most decisive parameters with the increasement of them. Due to space limitations, here will show the time consumption tendency in the heatmap form Digits, which is the representative dataset. 
+Although UMAP runs faster than t-SNE, there are still differences how each parameter infect the time consumption.  $n\_neighbors$ and $negative\_sample\_rate$ are two most decisive parameters with the increasement of them. Due to space limitations, here will show the time consumption tendency in the heatmap form Digits, which is the representative dataset:
 
 \begin{figure}[H]
 \centering  %图片全局居中
-\subfigure[$min\_dist$ and $negative\_sample\_rate$]
+% \subfigure[$min\_grad\_norm$ and $n\_iter$]
 {
 \label{Fig.sub.1}
-\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_min_dist_negative_sample_rate_heatmap.png}}
-\subfigure[$min\_dist$ and $spread$]
+\includegraphics[width=4.5cm,height=4.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_min_dist_negative_sample_rate_heatmap.png}}
+% \subfigure[$perplexity$ and $early\_exaggeration$]
 {
 \label{Fig.sub.2}
-\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_min_dist_spread_heatmap.png}}
+\includegraphics[width=4.5cm,height=4.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_n_neighbors_min_dist_heatmap.png}}
+% \subfigure[$perplexity$ and $n\_iter$]
+{
+\label{Fig.sub.3}
+\includegraphics[width=4.5cm,height=4.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_n_neighbors_negative_sample_rate_heatmap.png}}
+\centering
+\caption{Running time for negative\_sample\_rate and n\_neighbors on Digits dataset with other parameters set to default}
+% \label{Fig.main}
+\end{figure}
+
+% \begin{figure}[H]
+% \centering  %图片全局居中
+% \subfigure[$n\_neighbors$ and $spread$]
+% {
+% \label{Fig.sub.1}
+% \includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_n_neighbors_spread_heatmap.png}}
+% \subfigure[$spread$ and $negative\_sample\_rate$]
+% {
+% \label{Fig.sub.2}
+% \includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_spread_negative_sample_rate_heatmap.png}}
+% \caption{Heatmap result with all the parameter pair in Digit dataset}
+% % \label{Fig.main}
+% \end{figure}
+
+It is clear that $n\_neighbors$ and $negative\_sample\_rate$  play a major role in the increase of running time. When it comes to heatmap for $n\_neighbors$ and $negative\_sample\_rate$, the highest running time comes when these two parameters set to highest.
+
+\end{enumerate}\\
+
+\section{Largevis}
+
+This experiment focuses on the four most important parameters of the Largevis algorithm. The basic ideas of them are:
+
+\begin{enumerate}[1)]
+\item $perp$: The perplexity used for deciding edge weights in K-NNG
+\item $neg$: Number of negative samples used for negative sampling
+\item $gamma$: The weights assigned to negative edges
+\item $neigh$: Number of neighbors (K) in K-NNG, which is usually set as three times of perplexity
+\end{enumerate}\\
+
+\subsection{Installation and modification}
+
+Because the Largeevis algorithm is not integrated in any python software package, but a series of C++ and python source codes are provided on github, it needs to be deployed before using the algorithm. \\
+
+\noindent The C++ code needs to be compiled in the VS environment, so the first step is to download and configure Visual studio. Second, Since a large number of related library functions are used in the project, Boost must be configured in advance. The Boost library is a portable C++ library that provides source code. As a backup to the standard library, it is one of the development engines of the C++ standardization process.\\
+
+\noindent In principle, the Largevis should be installed on the computer after two procedures. however, since the python code of the source code is based on python 2.7 and version on the computer is 3.7. Also the C++ code's version is different, there are some API do not use the previous names and the usage of some functions changed also. It is also necessary to modify the code base on the differences. 
+
+\subsection{$perp$}
+
+Since the approach to calculate conditional probability and the weights of KNN graph is the same as t-SNE, the parameter $perplexity$ play the same role as before. 
+
+the weights of the edges in the K-nearest neighbor
+graph is the same approach as t-SNE.
+
+
+
+\subsection{hint}
+
+*** not finished ***
+wait for the result and analyze them individually.\\
+how parameters infect each other\\
+the parameter infect running time the most\\
+*** not finished ***
+
+\section{Visualization result with optimal parameters}
+
+After examining all representative scalar values using grid search, the optimal parameter settings of each algorithm for each dataset are generated. The figure below shows the visualization results of each algorithm on the data set:
+
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[t-SNE on Iris]
+{
+\label{Fig.sub.1}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/t-SNE_Iris_0.759.png}}
+\subfigure[UMAP on Iris]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/UMAP_Iris_0.749png.png}}
+% \caption{LD result for UMAP with n\_iter 2 and 15}
+% \label{Fig.main}
+\subfigure[LargeVis]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/Largevis_Iris_0601.png}}
+% \caption{LD result for UMAP with n\_iter 2 and 15}
+% \label{Fig.main}
+% \end{figure}
+
+% \begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[t-SNE on Wine]
+{
+\label{Fig.sub.1}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/t-SNE_Wine_0.797.png}}
+\subfigure[UMAP on Wine]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/UMAP_Wine_0.749png.png}}
+% \caption{LD result for UMAP with n\_iter 50 and 200}
+% \label{Fig.main}
+\subfigure[LargeVis]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/Largevis_Wine_0577_plot.png}}
+% \caption{LD result for UMAP with n\_iter 2 and 15}
+% \label{Fig.main}
+% \end{figure}
+
+% \begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[t-SNE on Oliv]
+{
+\label{Fig.sub.1}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/t-SNE_Oliv_0.6.png}}
+\subfigure[UMAP on Oliv]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/UMAP_Oliv_0.536.png}}
+% \caption{LD result for UMAP with n\_iter 2 and 15}
+% \label{Fig.main}
+\subfigure[LargeVis]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/Largevis_Oliv_0576_plot.png}}
 % \caption{LD result for UMAP with n\_iter 2 and 15}
 % \label{Fig.main}
 \end{figure}
 
 \begin{figure}[H]
 \centering  %图片全局居中
-\subfigure[$n\_neighbors$ and $min\_dis$]
+\subfigure[t-SNE on BCW]
 {
 \label{Fig.sub.1}
-\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_n_neighbors_min_dist_heatmap.png}}
-\subfigure[$n\_neighbors$ and $negative\_sample\_rate$]
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/t-SNE_BCW_0.768.png}}
+\subfigure[UMAP on BCW]
 {
 \label{Fig.sub.2}
-\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_n_neighbors_negative_sample_rate_heatmap.png}}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/UMAP_BCW_0.713.png}}
 % \caption{LD result for UMAP with n\_iter 50 and 200}
 % \label{Fig.main}
-\end{figure}
-
-\begin{figure}[H]
-\centering  %图片全局居中
-\subfigure[$n\_neighbors$ and $spread$]
-{
-\label{Fig.sub.1}
-\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_n_neighbors_spread_heatmap.png}}
-\subfigure[$spread$ and $negative\_sample\_rate$]
+\subfigure[LargeVis on BCW]
 {
 \label{Fig.sub.2}
-\includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/comparison/Digit_elapsed_time_spread_negative_sample_rate_heatmap.png}}
-\caption{Heatmap result with all the parameter pair in Digit dataset}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/Largevis_BCW_0731_plot.png}}
+% \caption{LD result for UMAP with n\_iter 2 and 15}
+% \label{Fig.main}
+% \end{figure}
+
+% \begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[t-SNE on Digits]
+{
+\label{Fig.sub.1}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/t-SNE_Digits_0.55.png}}
+\subfigure[UMAP on Digits]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/UMAP_Digits_0.499.png}}
+% \caption{LD result for UMAP with n\_iter 50 and 200}
+% \label{Fig.main}
+\subfigure[LargeVis]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/Largevis_Digits_0468_plot.png}}
+% \caption{Visualization results on 6 datasets}
+% \label{Fig.main}
+% \end{figure}
+
+% \begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[t-SNE on LFW]
+{
+\label{Fig.sub.1}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/t-SNE_LFW_0.359.png}}
+\subfigure[UMAP on LFW]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/UMAP_LFW_0.324.png}}
+% \caption{LD result for UMAP with n\_iter 50 and 200}
+% \label{Fig.main}
+\subfigure[LargeVis on LFW]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/conclusion/Largevis_LFW_0332_plot.png}}
+\caption{Visualization results on 6 datasets}
 % \label{Fig.main}
 \end{figure}
 
-It is clear that $n\_neighbors$ and $negative\_sample\_rate$  play a major role in the increase of running time. When it comes to heatmap for $n\_neighbors$ and $negative\_sample\_rate$, the highest running time comes when these two parameters set to highest.
 
-\end{enumerate}\\
+\noindent We can see that on the smallest data set with houndreds of instances and dimensions, like Iris, Wine and BCW, the visualization images generated by t-SNE, UMAP and LargeVis are both meaningful and can be compared with each other. \\
 
+\noindent However, when it comes to the image dataset, like Oliv(with N = 400, M = 1096) and LFW(with N = 13233 , M = 5749 ), all three algorithms do not have a good performance. At the same time, the outcome of Digits dataset(with N = 1797, M = 64), which is also a image dataset, identify the clusters clearly. This may because the image of the first two datasets are consist of houndreds of objects at different angles, after transforming them into pixels, the image of same object at different angle could be regarded as different clusters. \\
+
+\section{AUC values}
+
+Here below is the chart of AUC values on each dataset of algorithms:
+
+
+
+\section{Time consumption}
+
+
+\chapter{Conclusion}
+
+This paper studies the three most advanced data dimensionality reduction algorithms based on random neighbor embedding methods, namely t-SNE, UMAP and LargeVis. This article first derives three algorithms from the perspective of theory and experiment. The DR quality standard is also used to measure the performance of the three algorithms on different data sets. Then, check the more important parameters of each algorithm, and similar variables of different algorithms, and explore the possible reasons that lead to their different results. Finally, the grid search algorithm is used to measure the best variables of the three DR algorithms, and the similarities and differences of the algorithms running under the best conditions are compared. Experiments on actual data sets show that UMAP has better running time and retention of global structure, while LargeVis has better quality of local visualization results. Although t-SNE focus almost only on the local structure, the best parameter performance of its AUC value is at the same level as the other two algorithms. In the future, inspired by the neural network structure of the autoencoder, its middle layers will be compared horizontally, and the comparison dimension will be expanded from 2 dimensions to multiple dimensions.
+
+
+% \section{Comparison between algorithms with best parameters}
+
+% 6个数据集上三个算法采用 best parameters 进行DR效果展示
 

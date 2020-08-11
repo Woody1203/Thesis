@@ -2,10 +2,6 @@
 
 \chapter{T-distributed Stochastic Neighbor Embedding (t-SNE)}
 
-\section{Background}
-
-some related work and background
-
 \section{Asymmetric SNE}
 
 Given N observations of some high dimensional data, for any pair, $x_i$ and $x_j$, SNE defines the similarity (aka an affinity or weight) between them, using a Gaussian kernel function:
@@ -14,7 +10,7 @@ Given N observations of some high dimensional data, for any pair, $x_i$ and $x_j
     {v_{j\mid i}} = \exp {(-\beta_i r^2_{ij})} 
 \end{equation*}
 
-\noindent Where $r_i_j$ is the distance between $x_i$ and $x_j$ and $\beta_i$ must be determined by some method. The notation of $v_{i \mid j}$ rather than $v_i_j$, is to indicate that this quantity is not symmetric, i.e. $v_{i \mid j} \neq v_{j \mid i}$. This notation is from the conditional versus joint probability definitions used in symmetric SNE (see below). The $r_i_j$ notation indicates that the distances are symmetric.\\
+\noindent Where $r_i_j$ is the distance between $x_i$ and $x_j$ and $\beta_i$ is determined by the method below. The notation of $v_{i \mid j}$ rather than $v_i_j$, is to indicate that this quantity is not symmetric, i.e. $v_{i \mid j} \neq v_{j \mid i}$. This notation is from the conditional versus joint probability definitions used in symmetric SNE (see below). The $r_i_j$ notation indicates that the distances are symmetric.\\
 
 \noindent The weights are normalized to form $N$ probability distributions:
 
@@ -22,9 +18,7 @@ Given N observations of some high dimensional data, for any pair, $x_i$ and $x_j
     {p_{j\mid i}} = \frac {v_{j\mid i}} {\sum_k^N v_{k\mid i}}
 \end{equation*}
 
-\noindent $\beta_i$ is chosen by finding that value that results in the probability distribution having a specific perplexity. The perplexity has to be chosen by the user, but is interpreted as being a continuous version of the number of nearest neighbors, and generally is chosen to take values between 5 and 50. $p_{j\mid i}$ is a conditional probability, and is interpreted as the probability that item j will be chosen as being similar to item i, given that item i was picked already.
-
-\noindent At the same time, the output space of the embedded coordinates, which is the similarity between the points $y_i$ and $y_j$ is also defined as a Gaussian:
+\noindent $\beta_i$ is chosen by finding that value that results in the probability distribution having a specific perplexity. The perplexity has to be chosen by the user, but is interpreted as being a continuous version of the number of nearest neighbors, and generally is chosen to take values between 5 and 50. $p_{j\mid i}$ is a conditional probability, and is interpreted as the probability that item j will be chosen as being similar to item i, given that item i was picked already. At the same time, the output space of the embedded coordinates, which is the similarity between the points $y_i$ and $y_j$ is also defined as a Gaussian:
 
 \begin{equation*}
     {{w_i_j} = \exp {(-d^2_{ij})} }
@@ -44,7 +38,7 @@ Given N observations of some high dimensional data, for any pair, $x_i$ and $x_j
 \frac{\partial C_{SNE}}{\partial y_i} = 2\sum_j(p_{j \mid i} - q_{j \mid i} + p_{i \mid j} - q_{i \mid j} )(y_i - y_j)
 \end{equation*}
 
-\noindent Because KL distance is an asymmetric scale. The purpose of minimizing the cost function is to make the values of $p_{j∣i}$ and $q_{j∣i}$ as close as possible,  that is, the similarity of points in the low-dimensional space is consistent with the similarity of points in the high-dimensional space. But it can be trimmed from the form of the cost function. When $p_{j∣i}$ is relatively bigger and $q_{j∣i}$  is relatively smaller, the cost is higher; when $p_{j∣i}$ is smaller and $q_{j∣i}$ is bigger, the cost is lower. This means when two data points in a high-dimensional space are relatively close, if they are mapped to a low-dimensional space and are farther apart, then they will get a high penalty, which is of course no problem. Conversely, when the two data points in the high-dimensional space are farther apart, if they are mapped to the low-dimensional space, they will get a very low penalty value. This is a problem, and it should be a higher penalty. In other words, the cost function of SNE pays more attention to the local structure rather than global impact.
+\noindent Because KL distance is an asymmetric scale. The purpose of minimizing the cost function is to make the values of $p_{j∣i}$ and $q_{j∣i}$ as close as possible,  that is, the similarity of points in the low-dimensional space is consistent with the similarity of points in the high-dimensional space. But it can be trimmed from the form of the cost function. When $p_{j∣i}$ is relatively bigger and $q_{j∣i}$  is relatively smaller, the cost is higher; when $p_{j∣i}$ is smaller and $q_{j∣i}$ is bigger, the cost is lower. This means when two data points in a high-dimensional space are relatively close, if they are mapped to a low-dimensional space and are farther apart, then they will get a high penalty. In contrast, when the two data points in the high-dimensional space are farther apart, if they are mapped to the low-dimensional space, they will get a very low penalty value. This is a problem, and it should be a higher penalty. In other words, the cost function of SNE pays more attention to the local structure rather than global impact.
 
 \section{Symmetric SNE}
 In Symmetric SNE, the input probability matrix is symmetrized by averaging pj|i and pi|j and then re-normalized over all pairs of points, to create a single (joint) probability distribution, $p_i_j$:
@@ -71,7 +65,7 @@ In Symmetric SNE, the input probability matrix is symmetrized by averaging pj|i 
 \frac{\partial C_{SSNE}}{\partial y_i} = 4\sum_j(p_i_j - q_i_j)(y_i - y_j)
 \end{equation*}
 
-\noindent In the end, the result for UPS database, which has five kind of image of hand writing can be seen as below:
+% \noindent In the end, the result for UPS database, which has five kind of image of hand writing can be seen as below:
 
 % \begin{figure}[ht]
 
@@ -83,7 +77,7 @@ In Symmetric SNE, the input probability matrix is symmetrized by averaging pj|i 
 
 \section{The Crowding Problem}
 
-As we can observe from the image above, the dimension reduction result is satisfied, which means different kinds of images can be clustered by each category. However, the boundary between each cluster is not clear enough. It would be hard to tell the difference if there is no marks in different color for each group, which is also not convenient for data visualization.\\  
+By using the SNE method, the effect of the DR algorithm can be guaranteed, that is, the points of different clusters are more concentrated with each other. However, the boundary between each cluster is not always clear enough. It would be hard to tell the difference if there is no marks in different color for each group.\\  
 
 \noindent Part of the reason of this situation is the SNE algorithm pays more attention to the local structure than the global structure. The more important reason could be the difference between the high-dimensional space distance distribution and the low-dimensional space distance distribution. With the increase of the dimensions, the sparseness of high-dimensional spatial data will also increase because the volume increases exponentially.\\
 
@@ -124,7 +118,7 @@ Draw a random sample with a capacity of $N$ from the normal population. If the m
 \label{fig:label}
 \end{figure}
 
-\noindent From the figure 2.3, it can be easily observed that when there are no outliers, the fitting result of t distribution and Gaussian distribution are basically consistent. In the second picture, there are some abnormal points. Because the tail of the Gaussian distribution is low, it is more sensitive to abnormal points. In order to take care of these abnormal points, the fitting result of the Gaussian distribution deviates from the location of most samples, and the variance is also large. In contrast, the tail of the t distribution is relatively high and it is not sensitive to outliers, that ensure its robustness, so its fitting results are more reasonable, and the overall characteristics of the data are better captured.\\
+\noindent Figure 2.3 shows the difference when normal distribution and t-distribution handle outliers. It can be easily observed that when there are no outliers, the fitting result of t distribution and Gaussian distribution are basically consistent. In the second picture, there are some abnormal points. Because the tail of the Gaussian distribution is low, it is more sensitive to abnormal points. In order to take care of these abnormal points, the fitting result of the Gaussian distribution deviates from the location of most samples, and the variance is also large. In contrast, the tail of the t distribution is relatively high and it is not sensitive to outliers, that ensure its robustness, so its fitting results are more reasonable, and the overall characteristics of the data are better captured.\\
 
 \noindent With the t distribution now, for points that are close in high-dimensional space, in order to satisfy $p_i_j$=$q_i_j$, the distance in low-dimensional space needs to be slightly smaller; and for points that are far apart in high-dimensional space, in order to satisfy $p_i_j$=$q_i_j$, in low-dimensional space The distance needs to be farther. Then, We redefine the weight function from symmetric SNE: 
 
@@ -134,7 +128,7 @@ Draw a random sample with a capacity of $N$ from the normal population. If the m
 
 \section{Barnes-Hut t-SNE(BH t-SNE)}
 
-BH t-SNE has some improvements comparing with t-SNE algorithm with the help of tree-based algorithm, including two parts: one is the use of kNN graphs to represent the similarity of points in the high-dimensional space; the other is the optimization of the gradient solution process. The gradient calculation is divided into two parts of gravity and repulsion, and some optimization techniques are also used.
+BH t-SNE has some improvements comparing with t-SNE algorithm with the help of tree-based algorithm, including two parts: one is the use of kNN graphs to represent the similarity of points in the high-dimensional space. The other is the optimization of the gradient solution process. The gradient calculation is divided into two parts of gravity and repulsion, and some optimization techniques are also used.
 
 \subsection{kNN graph for the similarity in HD space}
 
@@ -158,7 +152,7 @@ BH t-SNE has some improvements comparing with t-SNE algorithm with the help of t
 
 \subsection{Approximation of repulsion in gradient}
 
-When understanding the physical meaning of t-SNE gradient, the gradient can be regarded as the resultant effect of all other points on $y_i$. If $Z$ is set as $Z = \sum_{k \neq l} (1+ \mid y_k−y_l \mid ^2)^{-1}$, then the gradient could be transformed by this feature:
+The t-SNE gradient could be regarded as a physical meaning, the gradient can be regarded as the resultant effect of all other points on $y_i$. If $Z$ is set as $Z = \sum_{k \neq l} (1+ \mid y_k−y_l \mid ^2)^{-1}$, then the gradient could be transformed by this feature:
 
 \begin{equation*}
 \begin{aligned}
@@ -205,25 +199,25 @@ When understanding the physical meaning of t-SNE gradient, the gradient can be r
 \label{Fig.main}
 \end{figure}
 
-\noindent Since the result from these two algorithm have similar accuracy and Barnes-Hut t-SNE is much faster than another. This thesis will focus the performance and characteristics of it.
+\noindent Since the result from these two algorithm have similar accuracy and Barnes-Hut t-SNE is much faster than another. This thesis will focus the performance and characteristics of it in the experiment part.
 
 % 再补两个通过bh t-SNE 和 t-SNE 的效果图
 
 \chapter{LargeVis}
 
+\noindent  Although t-SNE works well on small-scale data, there are still some disadvantages of t-SNE:
 
 
-\noindent  Although t-SNE works well on small-scale data, there are still some disadvantages of t-SNE:\\
-
-\noindent 1. The efficiency of t-SNE is significantly reduced when processing large-scale high-dimensional data (including BH t-SNE)\\
-
-\noindent 2.The parameters of t-SNE are sensitive to different data sets, which means that even finding out the proper parameters setting for t-SNE in one data set with there is a good visualization effect. However, it cannot be applied to another data set, and it takes a lot of time to find new suitable parameters.\\
+\begin{enumerate}[1)]
+\item The efficiency of t-SNE is significantly reduced when processing large-scale high-dimensional data (including BH t-SNE).
+\item The parameters of t-SNE are sensitive to different data sets, which means that even finding out the proper parameters setting for t-SNE in one data set with there is a good visualization effect. However, it cannot be applied to another data set, and it takes a lot of time to find new suitable parameters.
+\end{enumerate}\\
 
 \noindent As can be seen from the name, the goal of LargeVis\cite{ref5} is the visualization of large-scale data sets, which takes a different approach comparing with t-SNE: it reuses many of the same definitions as t-SNE but makes sufficiently modified so that stochastic gradient descent can be used. The main improvement is the efficient algorithm for constructing kNN graphs, as well as the low-dimensional space probability calculation formula and objective function.
 
 \section{Efficient kNN graph constructing algorithm}
 
-In the BH t-SNE, for high-dimensional spatial distance similarity, it only consider several neighbor points closest to $x_i$, which is essentially a process of constructing a kNN graph. The VP(vantage-point) tree is used to construct an accurate kNN graph, but the efficiency is still not good, especially for the large-scale dataset. And LargeVis uses a more ingenious way, instead of pursuing a one-step approach, first approximate and then improve accuracy.\\
+In the BH t-SNE, for high-dimensional spatial distance similarity, it only consider several neighbor points closest to $x_i$, which is essentially a process of constructing a kNN graph. The VP(vantage-point) tree is used to construct an accurate kNN graph, but the efficiency is still not good, especially for the large-scale dataset. And LargeVis uses a more ingenious way. Instead of pursuing a one-step approach, it first approximate and then improve accuracy.\\
 
 \subsection{K-D tree and Random Projection Tree}
 
@@ -265,31 +259,39 @@ There are generally three types of common methods for building KNN graph: the fi
 
 \subsection{The neighbor’s neighbor may also be my neighbor}
 
-The idea of "neighbors' neighbors may also be my neighbors", starting from an initial nearest-neighbor graph, the algorithm iteratively refines the graph by exploring the neighbors of neighbors defined according to the current graph\cite{ref5}. It use the neighbor search algorithm to find potential neighbors, calculating the distance between the neighbor and the current point, the neighbor's neighbor and the current point, and putting them into a small root pile. Take the k nodes with the smallest distance as k nearest neighbors, and finally get an accurate kNN graph.\\
+The idea of "neighbor's neighbor may also be my neighbor", starting from an initial nearest-neighbor graph, the algorithm iteratively refines the graph by exploring the neighbors of neighbors defined according to the current graph\cite{ref5}. It use the neighbor search algorithm to find potential neighbors, calculating the distance between the neighbor and the current point, the neighbor's neighbor and the current point, and putting them into a small root pile. Take the k nodes with the smallest distance as k nearest neighbors, and finally get an accurate kNN graph.\\
 
 \section{Low-dimensional space visualization algorithm}
 
 \noindent After completing the KNN graph algorithm for high dimensional space, we need to project the nodes of the graph into a low-dimensional space. In the process of low-dimensional space visualization, the idea of t-SNE is to ensure that the distance distribution P of the high-dimensional space and the distance distribution Q of the low-dimensional space are as close as possible, and use the KL distance to write the cost function and find the gradient. But the efficiency problem has not been solved well.\\
+\\
 
-\noindent In LargeVis algorithm, in order to solve the efficiency problem, a probability model is applied to it to maintain the similarity of vertices in low-dimensional space. That is, the algorithm will bring similar vertices close to each other in a low-dimensional space, and separate different vertices from each other. It uses two models from Word2vec and negaitve sampling optimization method to 
-achieve the goal.
+\noindent In LargeVis algorithm, in order to solve the efficiency problem, a probability model is applied to it to maintain the similarity of vertices in low-dimensional space. That is, the algorithm will bring similar vertices close to each other in a low-dimensional space, and separate different vertices from each other. It uses two models from Word2vec and negaitve sampling optimization method to achieve the goal.
 
 \subsection{Word2vec and Negative sampling}
-Word embedding is a way to present word using numerical representation in order to understand the contextual meaning of the words, While word2vec provide two kind of architectures 1)Continuous Bag of-Words (CBOW) and 2)Skip-gram and combine with two methods 1)negative sampling and 2)hierarchical softmax method to obtain this representation way of each word. Skip-gram: works well with a small amount of the training data, represents well even rare words or phrases. CBOW: several times faster to train than the skip-gram, slightly better accuracy for the frequent words.
+Word embedding is a way to present word using numerical representation in order to understand the contextual meaning of the words, While word2vec provide two kind of architectures 1)Continuous Bag of-Words (CBOW) and 2)Skip-gram and combine with two methods 1)negative sampling and 2)hierarchical softmax method to obtain this representation way of each word. The skip-gram works well with a small amount of the training data, represents well even rare words or phrases. While the CBOW is several times faster to train than the skip-gram with slightly better accuracy for the frequent words.
 
 \subsubsection{Two models of Word2vec}
 
-\noindent As we can see from the figure 3.4, the CBOW method, the surrounding words are used to predict the center word, so as to use the prediction result of the center word, use the Gradient Desent method to continuously adjust the vector of the surrounding words. When the training is completed, each word will be used as the central word, and the word vectors of the surrounding words are adjusted, so that the word vectors of all words in the entire text are obtained. The CBOW model performs better with a small amount of training data, and is more suitable for rare words or phrases.\\
+\noindent As we can see from the figure 3.4, the CBOW method, the surrounding words are used to predict the center word, so as to use the prediction result of the center word, use the Gradient Desent method to continuously adjust the vector of the surrounding words. When the training is completed, each word will be used as the central word, and the word vectors of the surrounding words are adjusted, so that the word vectors of all words in the entire text are obtained. In principle, the CBOW model performs better with a small amount of training data, and is more suitable for rare words or phrases.\\
 
 \begin{figure}[ht]
 
 \centering
-\includegraphics[scale=0.85]{images/image_largevis_word2vec.PNG}
+\includegraphics[width=12cm,height=7cm\textwidth]{images/image_largevis_word2vec.PNG}
 \caption{Two models of Word2vec}
 \label{fig:label}
 \end{figure}
 
-\noindent The Skip-gram uses the head word to predict surrounding words. In skip-gram, the prediction results of surrounding words are used, and Gradient Decent is used to continuously adjust the word vector of the central word. After all the text is traversed, the word vectors of all words in the text are obtained. The Skip-gram model is faster to train and is more suitable for frequent words or phrases.\\
+% \begin{figure}[ht]
+
+% \centering
+% \includegraphics[width=12cm,height=7cm\textwidth]{images/image_umap_LD Probability of Pairwise Euclidean Distances.png}
+% \caption{edge sampling example}
+% \label{fig:label}
+% \end{figure}\\
+
+\noindent The Skip-gram uses the head word to predict surrounding words. In skip-gram, the prediction results of surrounding words are used, and Gradient Decent is used to continuously adjust the word vector of the central word. After all the text is traversed, the word vectors of all words in the text are obtained. In principle, the Skip-gram model is faster to train and is more suitable for frequent words or phrases.\\
 
 
 \subsubsection{Negative sampling}
@@ -312,39 +314,38 @@ Word embedding is a way to present word using numerical representation in order 
     {log \sigma(v_{w_c}^T \cdot v_w)} + {\sum^k_{\substack{i=1\\ {E_{w_i} \sim P_n(f)}}}log \sigma(-v_{w_c}^T \cdot v_w)}
 \end{equation*}
 
-\noindent Where $w$ represents the target word, $w_c$ represents the word in the context window around the target word (positive sample), $w_i$ represents the word that does not appear in the context window (negative sample), $k$ represents the number of negative samples extracted, and $P_n(f)$ is Used for noise distribution generated by negative samples, $f$ represents word frequency, $P_n(f)∝f^{0.75}$. The exponent is suggested to set as 0.75\cite{ref7}, this makes the data closer to the center, which means the 
-higher values tend to lower and the lower values do the opposite in order to avoid high frequent words appearing all the time.
+\noindent Where $w$ represents the target word, $w_c$ represents the word in the context window around the target word (positive sample), $w_i$ represents the word that does not appear in the context window (negative sample), $k$ represents the number of negative samples extracted, and $P_n(f)$ is Used for noise distribution generated by negative samples, $f$ represents word frequency, $P_n(f)∝f^{0.75}$. The exponent is suggested to set as 0.75\cite{ref7}, this makes the data closer to the center, which means the higher values tend to lower and the lower values do the opposite in order to avoid high frequent words appearing all the time. 
+
+% The negative sampling algorithm derives edge sampling algorithm in large-scale information network embedding.
 
 \subsection{Large-scale Information Network Embedding (LINE) and edge-sampling algorithm}
 
 \noindent There are mainly two outstanding contributions for LINE: one is that it can adapt to various types (undirected edges or directed edges, weighted and unweighted) large-scale (million-level nodes, billion-level edges) networks, and can It captures the first-order and second-order similarities in the network very well; the second is to propose a very powerful edge-sampling algorithm, which greatly reduces the time complexity of LINE. After using the edge-sampling algorithm, the time complexity and The number of edges in the network is linear. The efficiency of LargeVis also benefits from LINE and its edge sampling algorithm.\\
 
-\noindent The first-order similarity refers to the point-to-point similarity between two nodes in the network, specifically the weight of the edge between the nodes (if the point does not have an edge, the first-order similarity is 0); the second-order similarity Sex means that if nodes share similar neighbor nodes, then the two tend to be similar. For example, in the case shown in the figure below, the weight of the edge is expressed in thickness:
+\noindent The first-order similarity refers to the point-to-point similarity between two nodes in the network, specifically the weight of the edge between the nodes (if the point does not have an edge, the first-order similarity is 0); the second-order similarity Sex means that if nodes share similar neighbor nodes, then the two tend to be similar. For example, in the case shown in the figure 3.6(a), the weight of the edge is expressed in thickness:
 
-\begin{figure}[ht]
-
-\centering
-\includegraphics[width=12cm,height=7cm\textwidth]{images/image_largevis_line_1.PNG}
-\caption{edge sampling example}
-\label{fig:label}
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[edge sampling]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=5cm\textwidth]{images/image_largevis_line_1.PNG}}
+\subfigure[negative sampling]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=5cm\textwidth]{images/image_largevis_ld_visulization_1.PNG}}
+\caption{edge sampling and negative sampling in the network}
+% \label{LD result for t-SNE with n_iter 300 and 500}
 \end{figure}
 
 
-\noindent The first-order similarity between node 8 and node 9 in the graph is higher because the weight of the directly connected edges is higher. Node 1 and node 7 have most of the same neighbors, so the second-order similarity between the two is very high. The idea of edge sampling algorithm comes from the negative sampling optimization technique used by Mikolov in word2vec. It not only improves the efficiency of training, but also solves the problem of sharp increase in gradient caused by the weighted edge in the network representation during the training process.\\
+\noindent The first-order similarity between node 8 and node 9 in the graph 3.6(a) is higher because the weight of the directly connected edges is higher. Node 1 and node 7 have most of the same neighbors, so the second-order similarity between the two is very high. The idea of edge sampling algorithm comes from the negative sampling optimization technique used by Mikolov in word2vec\cite{ref7}. It not only improves the efficiency of training, but also solves the problem of sharp increase in gradient caused by the weighted edge in the network representation during the training process.\\
 
-\subsection{Visualization algorithm}
+\subsection{LD Visualization algorithm}
 
-\noindent The application of negative sampling to words is mentioned above. In fact, it is similar in the network. We can regard the current center point as the target word, and its neighbor nodes as words appearing in the context window, then the center point and its neighbor nodes That is, it constitutes a positive sample, while the center point and non-neighboring points constitute a negative sample.
+\noindent The application of negative sampling to words is mentioned above. In fact, it is similar in the network. We can regard the current center point as the target word, and its neighbor nodes as words appearing in the context window, then the center point and its neighbor nodes That is, it constitutes a positive sample, while the center point and non-neighboring points constitute a negative sample.\\
 
-\begin{figure}[ht]
-
-\centering
-\includegraphics[scale=0.85]{images/image_largevis_ld_visulization_1.PNG}
-\caption{edge sampling example}
-\label{fig:label}
-\end{figure}
-
-\noindent As a small part of the kNN diagram shown above, if the blue point is the center point, each green point and the blue point can form a positive sample, and each yellow point and the blue point form a negative sample. How to map the structural relationship in this kNN graph to a low-dimensional space? Intuitively, in the low-dimensional space, the node pairs in the positive sample should be clustered together, while the node pairs in the negative sample are scattered far away. Let us first consider the case of a weightless network. Use $y_i$ and $y_j$ to represent two points in a low-dimensional space. The probability that the two points have a binary edge $e_i_j=1$ (the edge with weight 1) in the kNN graph is:
+\noindent As a small part of the kNN diagram shown on figure 3.6(b), if the blue point is the center point, each green point and the blue point can form a positive sample, and each yellow point and the blue point form a negative sample. Intuitively, we can map the structural relationship in this kNN graph to a low-dimensional space by clustering the node pairs in the positive sample should be clustered together, while the node pairs in the negative sample are scattered far away. If we consider the case of a weightless network. Use $y_i$ and $y_j$ to represent two points in a low-dimensional space. The probability that the two points have a binary edge $e_i_j=1$ (the edge with weight 1) in the kNN graph is:
 
 \begin{equation*}
     P(e_i_j = 1) = f( {\mid \mid y_i - y_j \mid \mid} ^ 2)
@@ -362,7 +363,7 @@ higher values tend to lower and the lower values do the opposite in order to avo
     O = \prod_{(i,j)∈E} P(e_i_j = 1) ^ {w_i_j} \prod_{(i,j)∈\bar E} (1 - P(e_i_j = 1) ^ {\gamma}) 
 \end{equation*}
 
-\noindent The optimization goal is to maximize the probability that a positive sample node pair has a connected edge in the kNN graph, and minimize the probability that a negative sample node pair has a connected edge in the kNN graph, where γ is our unified negative sample edge The set weight. Here is another logarithm, the optimization goal becomes:
+\noindent The optimization goal is to maximize the probability that a positive sample node pair has a connected edge in the kNN graph, and minimize the probability that a negative sample node pair has a connected edge in the kNN graph, where $\gamma$ is our unified negative sample edge The set weight. Here is another logarithm, the optimization goal becomes:
 
 \begin{equation*}
     O =  \sum_{(i,j)∈E}  w_i_j(p(e_i_j = 1)) \sum_{(i,j)∈\bar E} \gamma (1 - P(e_i_j = 1))
@@ -374,7 +375,7 @@ higher values tend to lower and the lower values do the opposite in order to avo
     O =  \sum_{(i,j)∈E}  w_i_j(p(e_i_j = 1)  +\sum^k_{\substack{k=1\\ {E_{i_k} \sim P_n(j)}}} \gamma log (1 - P(e_{ij_{k}}) = 1))
 \end{equation*}
 
-\noindent The objective function is very similar to the one for the Skip-gram model using the negative sampling technique. After the gradient is obtained, the edge weight $w_i_j$ still appears as a product of the product, which brings about a problem. The edge weight $w_i_j$ in the network varies widely. Therefore, affected by $w_i_j$, the gradient changes Will be relatively large, there will be the so-called gradient explosion and vanishing problem. After that, the edge sampling technique in LINE as discussed above is used. In fact, the principle is the same as negative sampling, but it is used in positive samples. If the weight of the edge between two points in the positive sample is $w_i_j$, we can convert it to $w_i_j$ overlapping binary edges.\\
+\noindent The objective function is very similar to the one for the Skip-gram model using the negative sampling technique. After the gradient is obtained, the edge weight $w_i_j$ still appears as a product of the product, which brings about a problem. The edge weight $w_i_j$ in the network varies widely. Therefore, affected by $w_i_j$, the gradient changes will be relatively large, there will be the so-called gradient explosion and vanishing problem. After that, the edge sampling technique in LINE as discussed above is used. In fact, the principle is the same as negative sampling, but it is used in positive samples. If the weight of the edge between two points in the positive sample is $w_i_j$, we can convert it to $w_i_j$ overlapping binary edges.\\
 
 \noindent If there are multiple large weighted edges (hundreds or even thousands), after converting to binary edges, the total number of edges is also very large, and all considerations will also affect efficiency. Therefore, after all weighted edges are converted into binary edges (equivalent to equidistant division), random sampling is performed from these binary edges (equivalent to weighted sampling). The advantages of the edge sampling algorithm are: on the one hand, because the sampled edges are binary edges, the weights are the same, which solves the problem of a large gradient range; on the other hand, the sampling process essentially follows the weighted sampling strategy , Because the edges with larger weights have more binary edges converted, the greater the probability of being sampled, which ensures correctness and rationality.\\
 
@@ -382,13 +383,11 @@ higher values tend to lower and the lower values do the opposite in order to avo
 
 \chapter{Uniform Manifold Approximation and Projection(Umap)}
 
-UMAP is another technique for dimensionality reduction using manifold learning after t-SNE. It comes from the theoretical framework of Riemannian geometry and algebraic topology. While ensuring scalability, it retains more of the global spatial structure and performs well during runtime. At the same time, UMAP has no restrictions on the size of embeddings, and can be used as a general-purpose dimensionality reduction technology for machine learning. \\
-
-\noindent This algorithm is very similar to t-SNE and largevis algorithms. Each uses a graph layout algorithm to divide the data in a low-dimensional space. In short, the high-dimensional graph representation of UMAP structure data, and then the low-dimensional graph is optimized to be appropriately similar in structure. There are some differences from t-SNE, leading to differences in the performance:\\
+UMAP is another technique for dimensionality reduction using manifold learning after t-SNE and LargeVis. It comes from the theoretical framework of Riemannian geometry and algebraic topology. The high-dimensional graph representation of UMAP structure data, and then the low-dimensional graph is optimized to be appropriately similar in structure.  While ensuring scalability, it retains more of the global spatial structure and performs well during runtime. At the same time, UMAP has no restrictions on the size of embeddings, and can be used as a general-purpose dimensionality reduction technology for machine learning. There are some differences from two other algorithms, leading to differences in the performance:\\
 
 \section{Exponential probability distribution in high dimensions}
 
-UMAP uses a high-dimensional exponential probability distribution, but does not necessarily use Euclidean distance like tSNE, but can insert any distance. In addition, it is different from the results obtained by t-SNE and LargeVis. Probabilities are not normalized:
+UMAP uses a high-dimensional exponential probability distribution, but does not necessarily use Euclidean distance like t-SNE, but can insert any distance. In addition, it is different from the results obtained by t-SNE and LargeVis. Probabilities are not normalized:
 
 \begin{equation*}
     {p_{j\mid i}} = \exp {[−(r_i_j− \rho_i)/\sigma_i]} 
@@ -404,7 +403,7 @@ UMAP also uses a different symmetrization of high-dimensional probability:
     {p_i_j} = p_{i\mid j} + p_{j\mid i} - p_{i\mid j}p_{j\mid i}
 \end{equation*}
 
-\noindent As in the t-SNE algorithm, symmetrization is necessary, because after UMAP glues points with locally varying metrics together (through the parameter ρ), it may happen that the weights between nodes A and B are not equal to The case of the weight between B and A nodes.
+\noindent As in the t-SNE algorithm, symmetrization is necessary, because after UMAP glues points with locally varying metrics together (through the parameter ρ), it may happen that the weights between nodes A and B are not equal to the weight between B and A nodes.
 
 \section{Probabilities in low dimensions}
 
@@ -424,7 +423,7 @@ UMAP also uses a different symmetrization of high-dimensional probability:
 \label{fig:label}
 \end{figure}\\
 
-\noindent The diagram 4.1 below shows how $a$ and $b$ changes the curve. From the graph, we can easily find that $a$ changes the smoothness of the slope, $b$ drastically changes the shape of the function, and after forming a smooth peak at the beginning of Y, it drops drastically. Which means when b is high, all data points are equally tightly connected in the beginning. That is, in the low-dimensional space, all the data points are similar in closeness and this may lead to the emergence of close clustering. UMAP uses the $min\_dist$ hyperparameter to find $a$ and $b$ from the nonlinear least squares fitting to the piecewise function:\\
+\noindent The diagram 4.1 below shows how $a$ and $b$ changes the curve. From the graph, we can easily find that $a$ changes the smoothness of the slope, $b$ drastically changes the shape of the function, and after forming a smooth peak at the beginning of Y, it drops drastically. Which means when b is high, all data points are equally tightly connected in the beginning. That is, in the low-dimensional space, all the data points are similar in closeness and this may lead to the emergence of close clustering. UMAP uses the $min\_dist$ hyperparameter to find $a$ and $b$ from the nonlinear least squares fitting to the piecewise function:
 
 \begin{equation*}
     {q_i_j} = (1 + a(y_i - y_j)^{2b} )^{-1} = \left\{
@@ -465,9 +464,7 @@ with \begin{equation*}
 \end{aligned}
 \end{equation*}\\
 
-\noindent In contrast to the random normal initialization used by tSNE, UMAP uses the Tulaplacian operator to assign initial low-dimensional coordinates. However, this should not have much impact on the final low-dimensional representation, at least for tSNE. However, this will reduce UMAP changes between each run because it is no longer randomly initialized. The choice of initialization by Graph Laplacian is to minimize KL divergence with early exaggeration in the initial stage of tSNE is equivalent to constructing Graph Laplacian.\\
-
-\noindent The graph Laplacian actually combines matrix factorization and neighbor graph methods to solve the dimensionality reduction problem. In this method, we first construct a knn-graph, then form the Laplacian matrix with matrix algebra, and finally decompose the Laplacian matrix to solve the eigenvalue decomposition problem.\\
+\noindent In contrast to the random normal initialization used by t-SNE, UMAP uses the graph laplacian to assign initial low-dimensional coordinates. However, this should not have much impact on the final low-dimensional representation, at least for t-SNE. However, this will reduce UMAP changes between each run because it is no longer randomly initialized. The choice of initialization by graph laplacian is to minimize KL divergence with early exaggeration in the initial stage of t-SNE is equivalent to constructing Graph Laplacian. The graph laplacian actually combines matrix factorization and neighbor graph methods to solve the DR problem. In this method, we first construct a knn-graph, then form the laplacian matrix with matrix algebra, and finally decompose the laplacian matrix to solve the eigenvalue decomposition problem.\\
 
 \chapter{Assessment Algorithm}
 
