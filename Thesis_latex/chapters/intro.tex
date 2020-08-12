@@ -9,8 +9,14 @@ With the rapid development of information technology, many fields need to proces
 \noindent At present, data dimension reduction(DR) has become an important method for data mining, computer vision, machine learning, and pattern recognition to solve Hughes phenomenon and dimension disasters. The data DR method is based on the spectral analysis of a specific sample matrix, converts the data in the original high dimension(HD) space into a low dimension(LD) subspace, and reveals the essential distribution structure or pattern relationship of the data in the high-dimensional space through the data DR method. This not only reduces the time complexity of data processing and makes it easier to find data structure information, but also low-dimensional data representation easier to visualize.\\
 
 
-\noindent The DR algorithms can be devided into two branches: Algorithms such as PCA and MDS seek to preserve the distance structure within the data whereas algorithms like t-SNE , Isomap, LargeVis, UMAP and Laplacian Eigenmaps favor the preservation of local distances over global distance.\\
+\noindent The DR algorithms can be devided into two branches: Algorithms such as principal component analysis (PCA)\cite{ref10} and Multidimensional scaling (MDS)\cite{ref14} seek to preserve the distance structure within the data whereas algorithms like t-SNE\cite{ref13}, Isomap\cite{ref16}, LargeVis\cite{ref5} and Uniform manifold approximation and projection(UMAP)\cite{ref17} favor the preservation of local distances over global distance.\\
 
-\noindent This thesis focus on three SNE based DR algorithms: BH t-SNE, LargeVis and UMAP, research the characteristics of the algorithms in different real-world datasets and provide a way to assess the performance of the results thanks to neighborhood-based DR performance criteria \cite{ref4}.
+% and Laplacian Eigenmaps\cite{ref18}
+
+\noindent This thesis mainly compares three DR algorithms: Barnes-Hut(BH) t-SNE\cite{ref9}, LargeVis and UMAP. They all base on Stochastic Neighbor Embedding (SNE)\cite{ref15} algorithm but sometimes has big different performance on  DR result and time consumption.\\
+
+\noindent This work searches the characteristics of the algorithms in real data sets of different instances and dimensions, and uses neighborhood-based DR performance criteria to provide method performance for evaluating the performance of the results\cite{ref4}. The work also discovers the similarities and differences of similar parameters in different algorithms and the reasons for the differences in performance between algorithms in the same data set. In the end, the optimal parameters of the three algorithms applied in each dataset with the help of the grid search algorithm, the examining code shows the visualization result in 2D on each dataset and related time consumption. The applicability of each algorithm in different situations is summarized.\\
+
+\noindent This paper is organized as follows: $Part II$ first reviews three algorithms and the DR performance criteria used in this study. $Part III$ details the experimental comparison results and draws the concludes.
 
 

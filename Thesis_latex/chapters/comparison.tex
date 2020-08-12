@@ -525,10 +525,28 @@ Because the Largeevis algorithm is not integrated in any python software package
 
 \subsection{$perp$}
 
-Since the approach to calculate conditional probability and the weights of KNN graph is the same as t-SNE, the parameter $perplexity$ play the same role as before. 
+Since the approach to calculate conditional probability in HD and the weights of KNN graph is the same as t-SNE, the parameter $perplexity$ play the similar role, which is basically to maintain a balance between the local and global aspects of the data. 
 
-the weights of the edges in the K-nearest neighbor
-graph is the same approach as t-SNE.
+ try different potential perplexity values in datasets
+
+% 因为没有$random_stateis$ 所以在看AUC的时候多次测量取平均值
+At the same time, since the algorithm using stochastic method, the parameter $random_stateis$ set to 1.
+
+
+% 不同数据集with不同perplexity。
+
+\subsection{other parameters}
+
+\subsection{elationships between algorithms and parameters}
+
+neg&perp\\
+% 观察heatmaps之后，发现这两个作为高维构建KNNG和低维可视化算法阶段对AUC影响最大的变量。A越高，B越低~~
+
+time\\
+% 三个algos可以一起比一下，用default values
+
+% 最影响running time 的para
+
 
 
 
