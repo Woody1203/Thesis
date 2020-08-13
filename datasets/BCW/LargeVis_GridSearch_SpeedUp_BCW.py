@@ -69,7 +69,7 @@ import umap
 import time
 import LargeVis
 import argparse
-from sklearn.datasets import load_iris, load_wine, load_breast_cancer
+from sklearn.datasets import load_iris, load_wine, load_breast_cancer, fetch_olivetti_faces, fetch_lfw_people
 
 
 try:
@@ -796,7 +796,7 @@ def viz_test(X, lab, tit=''):
     #plt.title("Umap", fontsize=40)
 
 ##test
-    plt.scatter(X[:, 0], X[:, 1], c=[sns.color_palette()[x] for x in lab], edgecolor='none',alpha=0.80,
+    plt.scatter(X[:, 0], X[:, 1], c=[sns.color_palette(n_colors = 400)[x] for x in lab], edgecolor='none',alpha=0.80,
     s=10)
     plt.gca().set_aspect('equal', 'datalim')
     plt.title('LargeVis projection of the Digit dataset', fontsize=24)
@@ -1057,19 +1057,30 @@ if __name__ == '__main__':
     # dataset = open_dataset_ccs()
     # X_hds, labels = open_dataset()
 
+# # BCW
     data_iris = load_breast_cancer()
+
+# # # oliv
+#     data_iris = fetch_olivetti_faces()
+
+# # LFW
+    # data_iris = fetch_lfw_people(min_faces_per_person=50, resize=0.4)
+
+    # data_iris = load_iris()
     X_hds = data_iris.data
     labels = data_iris.target
 
-    try:
-        rand_state = np.random.RandomState(0)
-        id_subs = rand_state.choice(a=X_hds.shape[0], size=700, replace=False)
-        X_hds, labels = X_hds[id_subs,:], labels[id_subs]
-        print("the size of dataset is:", X_hds.shape)
-        print("size after subsampling", X_hds.shape)
-    except:
-        print("the size of the dataset is less than 1000")
-        print("the size of dataset is:", X_hds.shape)
+    # X_hds, labels = sklearn.datasets.load_digits(n_class=10, return_X_y=True)
+
+    # try:
+    #     rand_state = np.random.RandomState(0)
+    #     id_subs = rand_state.choice(a=X_hds.shape[0], size=700, replace=False)
+    #     X_hds, labels = X_hds[id_subs,:], labels[id_subs]
+    #     print("the size of dataset is:", X_hds.shape)
+    #     print("size after subsampling", X_hds.shape)
+    # except:
+    #     print("the size of the dataset is less than 1000")
+    print("the size of dataset is:", X_hds.shape)
 
     output_txt_file_name = "test_digit_HD.txt"
     #  Use the previously defined variable "output_txt_file_name" as the txt file name here
@@ -1111,7 +1122,7 @@ if __name__ == '__main__':
     variable2 = 'neg_value'
     variable3 = 'gamma_value'
     variable4 = 'neigh_value'
-    dataset_name = 'Iris'
+    dataset_name = 'BCW'
     algorithm = 'LargeVis'
 
     Lmedw = [1.5, 1.0, 1.0]
@@ -1125,15 +1136,17 @@ if __name__ == '__main__':
     iterations_1 = [1]
     #neg_group = [3,5,7]
 
-    tot_largevis_perp_gourp = [15, 50, 70, 100, 300]
-    tot_largevis_neg_group = [2, 5, 10, 20, 50]
-    tot_largevis_gamma_group = [5, 7, 10, 20, 50]
-    tot_largevis_neigh_group = [20, 100, 150, 200, 500]
+    # tot_largevis_perp_gourp = [15, 50, 70, 100,200]
+    tot_largevis_perp_gourp = [20, 50, 100, 200, 500]
+    tot_largevis_neg_group = [3, 5, 10, 30, 50]
+    tot_largevis_gamma_group = [7]
+    tot_largevis_neigh_group = [150]
+    # tot_largevis_neigh_group = [100, 150, 200]
 
     tot_largevis_perp_gourp_test = [50]
     tot_largevis_neg_group_test = [5]
     tot_largevis_gamma_group_test = [7]
-    tot_largevis_neigh_group_test = [150,200]
+    tot_largevis_neigh_group_test = [200]
 
     tot_tsne_perp_group = [10, 30, 50, 100, 200] # default = 30
     tot_tsne_min_grad_norm_group = [1e-05, 1e-07, 1e-08, 1e-09, 1e-10] # default = 1e-07
