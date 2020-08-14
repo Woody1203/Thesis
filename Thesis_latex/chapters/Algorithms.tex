@@ -476,4 +476,6 @@ Similarity-based methods using Stochastic Neighbor Embedding such as t-SNE and i
     AUC  = \frac{ \sum_{K=1}^{N-2} R_{NX}(K)/K}{\sum_{K=1}^{N-2}K^{-1}}   \in [-1,1]
 \end{equation*}
 
-\noindent Where $v^K_i$ and $n^K_i$ index the K nearest neighbors of high dimension data point $x_i$ and $y_i$ in the HD and LDS, with $Q_{NX} (K) = \sum_{i \in I} \mid v^K_i \cap n^K_i \mid / (KN) \in [0, 1] $measuring their average normalized agreement\cite{ref8}. Its expectation for random LD points becomes $K/ (N − 1)$. With $R_{NX} (K) = ((N − 1)Q_{NX} (K) − K) /(N − 1 − K)$ for comparing different neighbour sizes \cite{ref11}, the curve of the DR quality could be displayed with a log-scale for K as closer neighbors. \\ 
+\noindent Where $v^K_i$ and $n^K_i$ index the K nearest neighbors of high dimension data point $x_i$ and $y_i$ in the HD and LDS, with $Q_{NX} (K) = \sum_{i \in I} \mid v^K_i \cap n^K_i \mid / (KN)$ This criterion varies between 0 and 1 and measures the average normalized agreement between corresponding K nearest neighborhoods in the HD and LD spaces\cite{ref18}. Its expectation for random LD points becomes $K/ (N − 1)$. With $R_{NX} (K) = ((N − 1)Q_{NX} (K) − K) /(N − 1 − K)$ for comparing different neighbour sizes \cite{ref11}, the curve of the DR quality could be displayed with a log-scale for K as closer neighbors. \\ 
+
+for $R_{NX}$. This criterion varies between 0 and 1 and measures the average normalized agreement between corresponding K nearest neighborhoods in the HD and LD spaces\\

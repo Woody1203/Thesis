@@ -61,11 +61,11 @@ There are 4 most important parameters for t-SNE, the ideas of each parameters ar
 {
 \label{Fig.sub.2}
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/image_comparison_tsne_perp50.png}}
-\caption{LD result for t-SNE with perplecity 20 and 50}
+% \caption{LD result for t-SNE with perplecity 20 and 50}
 % \label{LD result for t-SNE with n_iter 300 and 500}
-\end{figure}
+% \end{figure}
 
-\begin{figure}[H]
+% \begin{figure}[H]
 \centering  %图片全局居中
 % \subfigure[name1]
 {
@@ -75,7 +75,7 @@ There are 4 most important parameters for t-SNE, the ideas of each parameters ar
 {
 \label{Fig.sub.2}
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/image_comparison_tsne_perp200.png}}
-\caption{LD result for t-SNE with  perplecity 100 and 200}
+\caption{LD result for t-SNE with different perplecity}
 % \label{Fig.main}
 \end{figure}
 
@@ -98,11 +98,11 @@ There are 4 most important parameters for t-SNE, the ideas of each parameters ar
 {
 \label{Fig.sub.2}
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/t-sne/tsne_niter_500.png}}
-\caption{LD result for t-SNE with n\_iter 300 and 500}
+% \caption{LD result for t-SNE with n\_iter 300 and 500}
 % \label{Fig.main}
-\end{figure}
+% \end{figure}
 
-\begin{figure}[H]
+% \begin{figure}[H]
 \centering  %图片全局居中
 % \subfigure[name1]
 {
@@ -112,7 +112,7 @@ There are 4 most important parameters for t-SNE, the ideas of each parameters ar
 {
 \label{Fig.sub.2}
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/t-sne/tsne_niter_2000.png}}
-\caption{LD result for t-SNE with n\_iter 1000 and 2000}
+\caption{LD result for t-SNE with different n\_iter}
 % \label{Fig.main}
 \end{figure}
 
@@ -233,11 +233,11 @@ The size of the local neighborhood used for manifold approximation.  Its default
 {
 \label{Fig.sub.2}
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_digit_n_neighbor_15.png}}
-\caption{LD result for UMAP with n\_iter 2 and 15}
+% \caption{LD result for UMAP with n\_iter 2 and 15}
 % \label{Fig.main}
-\end{figure}
+% \end{figure}
 
-\begin{figure}[H]
+% \begin{figure}[H]
 % \subfigure[name1]
 {
 \label{Fig.sub.1}
@@ -246,7 +246,7 @@ The size of the local neighborhood used for manifold approximation.  Its default
 {
 \label{Fig.sub.2}
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_digit_n_neighbor_200.png}}
-\caption{LD result for UMAP with n\_iter 50 and 200}
+\caption{LD result for UMAP with different n\_iter}
 % \label{Fig.main}
 \end{figure}
 
@@ -279,11 +279,11 @@ The $min_dist$ parameter controls how tightly UMAP is allowed to pack points tog
 {
 \label{Fig.sub.2}
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_min_dist_0.1.png}}
-\caption{LD result for UMAP with min\_dist 0.0 and 0.1}
+% \caption{LD result for UMAP with min\_dist 0.0 and 0.1}
 % \label{Fig.main}
-\end{figure}
+% \end{figure}
 
-\begin{figure}[H]
+% \begin{figure}[H]
 \centering  %图片全局居中
 % \subfigure[name1]
 {
@@ -293,7 +293,7 @@ The $min_dist$ parameter controls how tightly UMAP is allowed to pack points tog
 {
 \label{Fig.sub.2}
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_min_dist_0.99.png}}
-\caption{LD result for UMAP with min\_dist 0.5 and 0.99}
+\caption{LD result for UMAP with different min\_dist}
 % \label{Fig.main}
 \end{figure}
 
@@ -319,11 +319,11 @@ This parameter determine the number of negative samples to select per positive s
 {
 \label{Fig.sub.2}
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_neg_10.png}}
-\caption{LD result for UMAP with min\_dist 0.0 and 0.1}
+% \caption{LD result for UMAP with min\_dist 0.0 and 0.1}
 % \label{Fig.main}
-\end{figure}
+% \end{figure}
 
-\begin{figure}[H]
+% \begin{figure}[H]
 \centering  %图片全局居中
 % \subfigure[name1]
 {
@@ -333,7 +333,7 @@ This parameter determine the number of negative samples to select per positive s
 {
 \label{Fig.sub.2}
 \includegraphics[width=7cm,height=3.5cm\textwidth]{images/umap/umap_neg_50.png}}
-\caption{LD result for UMAP with min\_dist 0.5 and 0.99}
+\caption{LD result for UMAP with negative\_sample\_rate}
 % \label{Fig.main}
 \end{figure}
 
@@ -509,10 +509,10 @@ It is clear that $n\_neighbors$ and $negative\_sample\_rate$  play a major role 
 This experiment focuses on the four most important parameters of the Largevis algorithm. The basic ideas of them are:
 
 \begin{enumerate}[1)]
-\item $perp$: The perplexity used for deciding edge weights in K-NNG
+\item $perp$: The perplexity used for deciding edge weights in KNN graph
 \item $neg$: Number of negative samples used for negative sampling
 \item $gamma$: The weights assigned to negative edges
-\item $neigh$: Number of neighbors (K) in K-NNG, which is usually set as three times of perplexity
+\item $neigh$: Number of neighbors (K) in KNN graph, which is usually set as three times of perplexity
 \end{enumerate}\\
 
 \subsection{Installation and modification}
@@ -525,42 +525,118 @@ Because the Largeevis algorithm is not integrated in any python software package
 
 \subsection{$perp$}
 
-Since the approach to calculate conditional probability in HD and the weights of KNN graph is the same as t-SNE, the parameter $perplexity$ play the similar role, which is basically to maintain a balance between the local and global aspects of the data. 
+Since the approach to calculate conditional probability in HD and the weights of KNN graph is the same as t-SNE, the parameter $perplexity$ play the similar role, which is basically to maintain a balance between the local and global aspects of the data by deciding edge weights in building HD KNN graph. Here below are visualization results with different potential perplexity values on 6 datasets:
 
- try different potential perplexity values in datasets
+\begin{figure}[H]
+\centering  %图片全局居中
+% \subfigure[BCW]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/largevis/image_largevis_perp20.png}}
+% \subfigure[Oliv]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/largevis/image_largevis_perp50.png}}
+% \caption{LD result for UMAP with n\_iter 50 and 200}
+% \label{Fig.main}
+% \end{figure}
 
-% 因为没有$random_stateis$ 所以在看AUC的时候多次测量取平均值
-At the same time, since the algorithm using stochastic method, the parameter $random_stateis$ set to 1.
+% \begin{figure}[H]
+\centering  %图片全局居中
+% \subfigure[Digit]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/largevis/image_largevis_perp100.png}}
+% \subfigure[LFW]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/largevis/image_largevis_perp200.png}}
+\caption{LargeVis results with different Perplexity}
+% \label{Fig.main}
+\end{figure}
+
+\noindent From the figure we can observe that when the $perplexity$ is 20 and 50, the clusters are well separated with a better global and local balance. While after 100, clusters start to merge. When $perplexity$ reach 200, the gap in between are blurry. The AUC value of them are 0.48, 0.487, 0.375, 0.383 separately because there are not the parameter $random_stateis$ in its source code, the values above are average score with 5 iterations for each considering that the algorithm are still using stochastic method.
+
+\subsection{$neigh$}
+As with the official Barnes-Hut t-SNE implementation, the LargeVis reference implementation uses a default perplexity of 50, and the default number of nearest neighbors is 3 times the perplexity. 
+
+\subsection{$neg$}
+
+As the key parameter for negative sampling in LD visualization part. $neg$ determine the number of negative samples used. Same as theoretical part, if we select samples an edge in the set of edges with the non-zero weight(E) such that $p_{ij} \neq 0$. This is called a “positive edge”. i and j are used to calculate the attractive part of the gradient. If we sample one of the N vertices($neg$). As datasets grow larger, the probability that $neg$ is in E grows smaller. Here below are visualization results with different potential perplexity values on Digits dataset: 
+
+\begin{figure}[H]
+\centering  %图片全局居中
+% \subfigure[BCW]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/largevis/image_largevis_neg3.png}}
+% \subfigure[Oliv]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/largevis/image_largevis_neg5.png}}
+% \caption{LD result for UMAP with n\_iter 50 and 200}
+% \label{Fig.main}
+% \end{figure}
+
+% \begin{figure}[H]
+\centering  %图片全局居中
+% \subfigure[Digit]
+{
+\label{Fig.sub.1}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/largevis/image_largevis_neg10.png}}
+% \subfigure[LFW]
+{
+\label{Fig.sub.2}
+\includegraphics[width=7cm,height=3.5cm\textwidth]{images/largevis/image_largevis_neg30.png}}
+\caption{LargeVis results with different neg}
+% \label{Fig.main}
+\end{figure}
+
+\noindent As we can see from 6.13, the average distance between clusters increase as $neg$ variable increases. Their AUC values are 0.45, 0.46, 0.50, 0.51 separately. This is because the "repulsive force" of the cost function strengthened. At the same time, the time consumption is also added since the vertices of KNN graph it need to consider increased multiple times. 
+
+\subsection{$gamma$}
+
+$gamma$ stand for the weights assigned to negative edges. In the optimization process of Largevis, the goal is to maximize the probability that a positive sample node pair has a connected edge in the kNN graph, and minimize the probability that a negative sample node pair has a connected edge in the kNN graph, where $\gamma$ is the unified the weight set by the negative sample edge. Similar to the relationship between perp and neigh, $nag$ and $gamma$ set the number and weight of negative sample edges.
+
+\subsection{relationships between algorithms and parameters}
+
+% 1)
+
+After observing the heatmap results, the two most important parameters for building KNN graph in HD and visualization algorithm in LD, have the greatest impact on AUC values. Here below are the relationships between them:
+
+\begin{figure}[H]
+\centering  %图片全局居中
+\subfigure[BCW]
+{
+\label{Fig.sub.1}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/largevis/heatmap_perp_neg_BCW.png}}
+\subfigure[Digits]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/largevis/heatmap_perp_neg_Digits.png}}
+% \caption{LD result for UMAP with n\_iter 2 and 15}
+% \label{Fig.main}
+\subfigure[LFW]
+{
+\label{Fig.sub.2}
+\includegraphics[width=4.5cm,height=3.5cm\textwidth]{images/largevis/heatmap_perp_neg_LFW.png}}
+% \caption{LD result for UMAP with n\_iter 2 and 15}
+% \label{Fig.main}
+\end{figure}
+
+\subsection{time consumption}
+
+It is easy to find that LargeVis sometimes consume more time than t-SNE during the examination procedure. 
+
+% 1 最影响running time 的para
 
 
-% 不同数据集with不同perplexity。
-
-\subsection{other parameters}
-
-\subsection{elationships between algorithms and parameters}
-
-neg&perp\\
-% 观察heatmaps之后，发现这两个作为高维构建KNNG和低维可视化算法阶段对AUC影响最大的变量。A越高，B越低~~
-
-time\\
-% 三个algos可以一起比一下，用default values
-
-% 最影响running time 的para
-
-
-
-
-\subsection{hint}
-
-*** not finished ***
-wait for the result and analyze them individually.\\
-how parameters infect each other\\
-the parameter infect running time the most\\
-*** not finished ***
+% 2 三个algos可以一起比一下，用default values
+% 之后提出问题，why Largevis is slower than t-sne
 
 \section{Visualization result with optimal parameters}
 
-After examining all representative scalar values using grid search, the optimal parameter settings of each algorithm for each dataset are generated. The figure below shows the visualization results of each algorithm on the data set:
+After examining all representative representative parameter values using grid search, the optimal parameter settings of each algorithm for each dataset are generated. The figure below shows the visualization results of each algorithm on the data set:
 
 
 \begin{figure}[H]
@@ -683,7 +759,6 @@ After examining all representative scalar values using grid search, the optimal 
 % \label{Fig.main}
 \end{figure}
 
-
 \noindent We can see that on the smallest data set with houndreds of instances and dimensions, like Iris, Wine and BCW, the visualization images generated by t-SNE, UMAP and LargeVis are both meaningful and can be compared with each other. \\
 
 \noindent However, when it comes to the image dataset, like Oliv(with N = 400, M = 1096) and LFW(with N = 13233 , M = 5749 ), all three algorithms do not have a good performance. At the same time, the outcome of Digits dataset(with N = 1797, M = 64), which is also a image dataset, identify the clusters clearly. This may because the image of the first two datasets are consist of houndreds of objects at different angles, after transforming them into pixels, the image of same object at different angle could be regarded as different clusters. \\
@@ -692,10 +767,11 @@ After examining all representative scalar values using grid search, the optimal 
 
 Here below is the chart of AUC values on each dataset of algorithms:
 
-
+% 可以画一个不同dataset上的散点图
 
 \section{Time consumption}
 
+% 可以画一个不同dataset上的散点图
 
 \chapter{Conclusion}
 
