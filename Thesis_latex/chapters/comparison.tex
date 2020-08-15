@@ -809,11 +809,12 @@ After examining all representative representative parameter values using grid se
 % 可以画一个不同dataset上的散点图
 \\
 \\
-\noindent From the above results, we can find out that:\\
+\noindent From the all the results, we can find out that:\\
 
 \begin{enumerate}[1)]
 \item The number of dimension does not really matters the running time.
 \item The AUC score of t-SNE and Largevis with optimal parameters are almost the same with always 1 to 2 percent of difference. However, the AUC score of UMAP always has less 7 to 8 percent. 
+% \item The parameters vary less strong from dataset to dataset comparing to two other algorithm, which means 
 \item Considering the following time consumption and LD results above, we can draw the conclusion that when it is needed to have a fast result or better understanding of global structure of HD data, the UMAP is the best choice. If the result need to be more accurate and more attention to details of the structure in HD, when the instances of the dataset is less than $10^5$ level, t-SNE will save more time. When it is above, LargeVis is the better one with less time consumption\cite{ref5}.
 \end{enumerate}\\
 

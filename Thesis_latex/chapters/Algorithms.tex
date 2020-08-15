@@ -2,6 +2,8 @@
 
 \chapter{T-distributed Stochastic Neighbor Embedding (t-SNE)}
 
+Stochastic Neighbor Embedding(SNE) is a machine learning algorithm for visualization. It is a nonlinear dimensionality reduction technique that suit for embedding high-dimensional data for visualization in a low-dimensional space of two or three dimensions. Specifically, it maps similar data points in the high-dimensional space to the low-dimensional space so that similar objects are modeled by nearby points and dissimilar objects are modeled by distant points with high probability so that it can keep the resltionship between data points. The conventional method is to use Euclidean distance to express this similarity, and SNE converts this distance relationship into a conditional probability to express the similarity. 
+
 \section{Asymmetric SNE}
 
 Given N observations of some high dimensional data, for any pair, $x_i$ and $x_j$, SNE defines the similarity (aka an affinity or weight) between them, using a Gaussian kernel function:
@@ -15,10 +17,17 @@ Given N observations of some high dimensional data, for any pair, $x_i$ and $x_j
 \noindent The weights are normalized to form $N$ probability distributions:
 
 \begin{equation*}
-    {p_{j\mid i}} = \frac {v_{j\mid i}} {\sum_k^N v_{k\mid i}}
+    {p_{j\mid i}} = \frac{\exp(-\mid \mid x_i - x_j \mid \mid^2/ 2 \sigma_i^2)}{\sum_{i\neq k}\exp(-\mid \mid x_i - x_k \mid \mid^2/ 2 \sigma_i^2}
 \end{equation*}
 
-\noindent $\beta_i$ is chosen by finding that value that results in the probability distribution having a specific perplexity. The perplexity has to be chosen by the user, but is interpreted as being a continuous version of the number of nearest neighbors, and generally is chosen to take values between 5 and 50. $p_{j\mid i}$ is a conditional probability, and is interpreted as the probability that item j will be chosen as being similar to item i, given that item i was picked already. At the same time, the output space of the embedded coordinates, which is the similarity between the points $y_i$ and $y_j$ is also defined as a Gaussian:
+\noindent Where $\sigma_i$ represents the variance of the Gaussian distribution with $x_i$ as the center point. When the data is mapped to the low-dimensional space, the similarity between high-dimensional data points should also be reflected in the data points in the low-dimensional space. If we assume that the mapping points of high-dimensional data points $x_i$ and $x_j$ in low-dimensional space are $yi$ and $yj$, respectively. Similarly and set the variance of all Gaussian distributions to $1/\sqrt2$, the conditional probability in low-dimensional space is represented by $q_{j\mid i }$:
+
+\begin{equation*}
+    {q_{j\mid i}} = \frac{\exp(-\mid \mid x_i - x_j \mid \mid^2/ 2 \sigma_i^2)}{\sum_{i\neq k}\exp(-\mid \mid x_i - x_k \mid \mid^2/ 2 \sigma_i^2}
+\end{equation*}
+
+
+\noindent As for symbol $\beta_i$, it is chosen by finding the value that results in the probability distribution having a specific perplexity. The perplexity has to be chosen by the user, but is interpreted as being a continuous version of the number of nearest neighbors, and generally is chosen to take values between $5$ and $50$. $p_{j\mid i}$ is a conditional probability, and is interpreted as the probability that item $j$ will be chosen as being similar to item $i$, given that item $i$ was picked already. At the same time, the output space of the embedded coordinates, which is the similarity between the points $y_i$ and $y_j$ is also defined as a Gaussian:
 
 \begin{equation*}
     {{w_i_j} = \exp {(-d^2_{ij})} }
@@ -53,7 +62,7 @@ In Symmetric SNE, the input probability matrix is symmetrized by averaging pj|i 
     {q_{i j}} = \frac {w_{i j}} {\sum_k^N \sum_l^N w_{k l}}
 \end{equation*}
 
-\noindent Where $N$ is the total number of data points, this definition not only satisfies the symmetry, but also ensures that the penalty value of xi will not be too small. Which maens no matter where the outlier's mapping point in low dimension $y_i$ in the space is at any position, the penalty value can be guaranteed. At this time, the following cost function can be written using KL distance:
+\noindent Where $N$ is the total number of data points, this definition not only satisfies the symmetry, but also ensures that the penalty value of xi will not be too small. Which means no matter where the outlier's mapping point in low dimension $y_i$ in the space is at any position, the penalty value can be guaranteed. At this time, the following cost function can be written using KL distance:
 
 \begin{equation*}
     {C_S_S_N_E} = {\sum_i KL(P \mid \mid Q)} =  { {\sum_i^N} {\sum_j^N} {p_{i j}} \log \frac{p_{i j}}{q_{i j}} }
@@ -87,15 +96,15 @@ By using the SNE method, the effect of the DR algorithm can be guaranteed, that 
 
 \centering
 \includegraphics[scale=0.34]{images/image_crowding_problem_1.png}
-\caption{distribution of distances between $x_i$ with dimension 2 to 5}
+% \caption{distribution of distances between $x_i$ with dimension 2 to 5}
 \label{fig:label}
-\end{figure}
+% \end{figure}
 
-\begin{figure}[ht]
+% \begin{figure}[ht]
 
 \centering
 \includegraphics[scale=0.34]{images/image_crowding_problem_2.png}
-\caption{distribution of distances between $x_i$ with dimension 8 to 15}
+\caption{distribution of distances between $x_i$ with different dimensions}
 \label{fig:label}
 \end{figure}
 
@@ -108,7 +117,7 @@ Draw a random sample with a capacity of $N$ from the normal population. If the m
     {t} =  \frac {\bar{x} - \mu}{s / \sqrt{N}} 
 \end{equation*}
 
-\noindent $t$ satisfies the t distribution with n−1 degrees of freedom, written as, $t∼t(n−1)$. t distribution is a typical long-tailed distribution. It is relatively gentle at both ends of the tail, which has obvious advantages when dealing with small samples and abnormal points.\\
+\noindent $t$ satisfies the t distribution with n−1 degrees of freedom, written as, $t∼t(n−1)$. The t-distribution is symmetric and bell-shaped, like the normal distribution, but has heavier tails, meaning that it is more prone to producing values that fall far from its mean, which has obvious advantages when dealing with small samples and abnormal points.\\
 
 \begin{figure}[ht]
 
@@ -118,9 +127,7 @@ Draw a random sample with a capacity of $N$ from the normal population. If the m
 \label{fig:label}
 \end{figure}
 
-\noindent Figure 2.3 shows the difference when normal distribution and t-distribution handle outliers. It can be easily observed that when there are no outliers, the fitting result of t distribution and Gaussian distribution are basically consistent. In the second picture, there are some abnormal points. Because the tail of the Gaussian distribution is low, it is more sensitive to abnormal points. In order to take care of these abnormal points, the fitting result of the Gaussian distribution deviates from the location of most samples, and the variance is also large. In contrast, the tail of the t distribution is relatively high and it is not sensitive to outliers, that ensure its robustness, so its fitting results are more reasonable, and the overall characteristics of the data are better captured.\\
-
-\noindent With the t distribution now, for points that are close in high-dimensional space, in order to satisfy $p_i_j$=$q_i_j$, the distance in low-dimensional space needs to be slightly smaller; and for points that are far apart in high-dimensional space, in order to satisfy $p_i_j$=$q_i_j$, in low-dimensional space The distance needs to be farther. Then, We redefine the weight function from symmetric SNE: 
+\noindent Figure 2.3 shows the difference when normal distribution and t-distribution handle outliers. It can be easily observed that when there are no outliers, the fitting result of t distribution and Gaussian distribution are basically consistent. In the second picture, there are some abnormal points. Because the tail of the Gaussian distribution is low, it is more sensitive to abnormal points. In order to take care of these abnormal points, the fitting result of the Gaussian distribution deviates from the location of most samples, and the variance is also large. In contrast, the tail of the t distribution is relatively high and it is not sensitive to outliers, that ensure its robustness, so its fitting results are more reasonable, and the overall characteristics of the data are better captured. In order to avoid influence of outliers, we can then redefine the weight function from symmetric SNE with t-distribution: 
 
 \begin{equation*}
     {w_i_j} =  \frac {1}{1+d_i_j^2} 
@@ -148,7 +155,7 @@ BH t-SNE has some improvements comparing with t-SNE algorithm with the help of t
 
 \noindent These three formulas means every data point need to calculate the variance considering all other points. But in fact, the probability $p_i_j$ that two distant points are neighbors to each other is very small and almost negligible. This makes the efficiency of t-SNE is significantly reduced when processing large-scale high-dimensional data.\\
 
-\noindent Therefore, when constructing a distance similarity relationship for a point in a high-dimensional space, it is not necessary to consider every node in the graph, only a number of similar nodes. Here we consider the ⌊3$u$⌋ points closest to the point $x_i$, where $u$ is the perplexity of the conditional probability distribution around the point $x_i$, and only consider the set of these points, which will decrease the amount of calculation. The BH t-SNE algorithm uses a VP tree (vantage-point tree) to construct this kNN graph, and an accurate kNN graph can be obtained within O ($uNlogN$) time complexity.\\
+\noindent Therefore, when constructing a distance similarity relationship for a point in a high-dimensional space, it is not necessary to consider every node in the graph, only a number of similar nodes. Here we consider the ⌊3$k$⌋ points closest to the point $x_i$, where $k$ is the perplexity of the conditional probability distribution around the point $x_i$, and only consider the set of these points, which will decrease the amount of calculation. The BH t-SNE algorithm uses a VP tree (vantage-point tree) to construct this kNN graph, and an accurate kNN graph can be obtained within O ($kNlogN$) time complexity.\\
 
 \subsection{Approximation of repulsion in gradient}
 
@@ -157,7 +164,7 @@ The t-SNE gradient could be regarded as a physical meaning, the gradient can be 
 \begin{equation*}
 \begin{aligned}
 \frac{\partial C_{SSNE}}{\partial y_i} &= {4\sum_j(p_i_j - q_i_j)(y_i - y_j)(1 + \mid y_i - y_j \mid ^ 2) ^{-1}}\\
-&= {4\sum_j(p_i_j - q_i_j) (1 + \mid \mid y_i - y_j \mid \mid ^ 2)}
+&= {4\sum_j(p_i_j - q_i_j) q_{ij}Z(y_i - y_j)}
 \end{aligned}
 \end{equation*}
 
@@ -182,6 +189,8 @@ The t-SNE gradient could be regarded as a physical meaning, the gradient can be 
 
 \noindent This situation is very common in low-dimensional space, and even the repulsive force of each point in a certain area can be approximated by the same value. If a point is given arbitrarily, we just need to calculate the repulsion between given point and the centroid of the data points within the certain area, and use the optimization method just now to calculate the total repulsion for them. Of course, not all regions meet this approximate condition. Here, the Barnes-Hut algorithm is used to search and verify the point-region pairs that meet the approximate condition.\\
 
+The quad tree is used to complete the area search task\cite{ref9}, and uses the repulsive force generated by the center of the area as the representative value of the entire area. Of course, not all areas meet this approximate condition. Here, the Barnes-Hut algorithm is used to search and verify that the approximate conditions are met. Point-area pairs.
+
 \subsection{From point-area to area-area}
 
 \noindent In the above approximation, we consider the approximation of the repulsive force between a point and an area. In fact, we can further optimize and consider the approximation of the repulsive force between one area and another area.
@@ -199,7 +208,10 @@ The t-SNE gradient could be regarded as a physical meaning, the gradient can be 
 \label{Fig.main}
 \end{figure}
 
-\noindent Since the result from these two algorithm have similar accuracy and Barnes-Hut t-SNE is much faster than another. This thesis will focus the performance and characteristics of it in the experiment part.
+\noindent Since the result from these two algorithm have similar accuracy and Barnes-Hut t-SNE is much faster than another. This thesis will focus the performance and characteristics of it in the experiment part.\\
+
+\noindent Similarly, it is also necessary to determine whether the repulsive force between the two regions meets the approximate conditions. Dual tree algorithm is used to search and verify the region-region pairs that meet the approximate conditions\cite{ref9}. By constructing the relationship between the area and the area instead of points to points, the calculation of attraction and repulsion 
+force of cost function reduced to only consider the relationship between the limited areas, and the amount of calculation is significantly decreased from $O(n^2)$ to $O(nlogn)$
 
 % 再补两个通过bh t-SNE 和 t-SNE 的效果图
 
